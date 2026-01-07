@@ -1,4 +1,4 @@
-"""The time_travel tool - core of the experiment.
+"""The reset_context tool - core of the experiment.
 
 This tool allows an agent to:
 1. Extract a learning from the current exploration
@@ -16,14 +16,14 @@ from pydantic import BaseModel
 from .base import Tool, ToolResult
 
 
-class TimeTravelRequest(BaseModel):
-    """Request to time travel."""
+class ResetContextRequest(BaseModel):
+    """Request to reset context with a learning."""
 
     learning: str
     steps_back: int
 
 
-class TimeTravelTool(Tool):
+class ResetContextTool(Tool):
     """Tool that lets the agent drop context and keep only a learning.
 
     When invoked, this signals to the agent harness that it should:
@@ -38,20 +38,25 @@ class TimeTravelTool(Tool):
 
     @property
     def name(self) -> str:
-        return "time_travel"
+        return "reset_context"
 
     @property
     def description(self) -> str:
-        return """Time Travel Tool
+        return """Reset the conversation context by dropping recent messages and preserving a summary.
 
-This tool allows you go back in time by dropping recent conversation messages while preserving key learnings. This is very useful if you are solving a complex problem and you have ended up going down unproductive paths. This is also useful if you have discovered important information that should be retained but the surrounding context is no longer relevant.
+Use this when:
+- You've been exploring unproductive paths and want to start fresh
+- You found what you needed and the search steps are now clutter
+- You want to try a different approach without confusion from failed attempts
 
-For example:
+What it does:
+1. Drops the last N messages from the conversation
+2. Injects your "learning" summary back into context
+3. You continue from there with a clean slate
 
-1. You have been trying to debug a piece of code for a while and have made several failed attempts. You realize that your previous approach was flawed. You can use this tool to drop the irrelevant messages while keeping the important insights you gained.
-2. You have been searching through files and logs but have not found the root cause of an issue. After some exploration, you finally discover a crucial piece of information. You can use this tool to drop the previous search attempts while retaining the key learning.
-
-This tool allows you to keep your context clean and focused by removing clutter from unproductive explorations, while still preserving the valuable knowledge you have acquired.
+Example: After 8 messages searching for a config file, you find it at /src/config.yaml.
+Call: reset_context(learning="Config file is at /src/config.yaml", steps_back=8)
+Result: The 8 search messages are removed, your learning is preserved, context is cleaner.
 """
 
     @property
@@ -62,16 +67,16 @@ This tool allows you to keep your context clean and focused by removing clutter 
                 "learning": {
                     "type": "string",
                     "description": (
-                        "What you learned from this exploration. This will be injected "
-                        "back into context after dropping messages. Be specific and actionable."
+                        "A summary of what you learned. This will be preserved "
+                        "after dropping messages. Be specific: include file paths, "
+                        "line numbers, root causes, or key decisions."
                     ),
                 },
                 "steps_back": {
                     "type": "integer",
                     "description": (
-                        "How many messages to drop from the conversation. "
-                        "Count your recent messages to determine this. "
-                        "Must be at least 1."
+                        "How many recent messages to drop. Count your tool calls "
+                        "and responses since you started this exploration path."
                     ),
                     "minimum": 1,
                 },
@@ -80,13 +85,13 @@ This tool allows you to keep your context clean and focused by removing clutter 
         }
 
     async def execute(self, **kwargs: Any) -> ToolResult:
-        """Signal time travel request.
+        """Signal reset context request.
 
         The actual context manipulation happens in the agent harness.
         This just validates the request and returns a signal.
         """
         try:
-            request = TimeTravelRequest(**kwargs)
+            request = ResetContextRequest(**kwargs)
 
             # Validate steps_back is at least 1
             if request.steps_back < 1:
@@ -99,22 +104,22 @@ This tool allows you to keep your context clean and focused by removing clutter 
             # Return a special signal that the harness will interpret
             return ToolResult(
                 success=True,
-                output=f"TIME_TRAVEL_SIGNAL::{request.learning}::{request.steps_back}",
+                output=f"RESET_CONTEXT_SIGNAL::{request.learning}::{request.steps_back}",
             )
         except Exception as e:
             return ToolResult(
                 success=False,
                 output="",
-                error=f"Invalid time travel request: {e}",
+                error=f"Invalid reset_context request: {e}",
             )
 
 
-def parse_time_travel_signal(output: str) -> TimeTravelRequest | None:
-    """Parse a time travel signal from tool output.
+def parse_reset_context_signal(output: str) -> ResetContextRequest | None:
+    """Parse a reset context signal from tool output.
 
-    Returns None if not a time travel signal.
+    Returns None if not a reset context signal.
     """
-    if not output.startswith("TIME_TRAVEL_SIGNAL::"):
+    if not output.startswith("RESET_CONTEXT_SIGNAL::"):
         return None
 
     parts = output.split("::", 2)
@@ -122,9 +127,15 @@ def parse_time_travel_signal(output: str) -> TimeTravelRequest | None:
         return None
 
     try:
-        return TimeTravelRequest(
+        return ResetContextRequest(
             learning=parts[1],
             steps_back=int(parts[2]),
         )
     except (ValueError, IndexError):
         return None
+
+
+# Backwards compatibility aliases
+TimeTravelTool = ResetContextTool
+TimeTravelRequest = ResetContextRequest
+parse_time_travel_signal = parse_reset_context_signal

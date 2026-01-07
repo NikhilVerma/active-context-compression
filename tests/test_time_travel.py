@@ -1,14 +1,14 @@
-"""Tests for the time travel tool."""
+"""Tests for the reset_context tool (formerly time_travel)."""
 
 import pytest
 
-from src.tools import TimeTravelTool, parse_time_travel_signal
+from src.tools import ResetContextTool, parse_reset_context_signal
 
 
 @pytest.mark.asyncio
-async def test_time_travel_tool_basic():
-    """Test basic time travel tool execution."""
-    tool = TimeTravelTool()
+async def test_reset_context_tool_basic():
+    """Test basic reset_context tool execution."""
+    tool = ResetContextTool()
 
     result = await tool.execute(
         learning="The config file is at /src/config.yaml",
@@ -16,15 +16,15 @@ async def test_time_travel_tool_basic():
     )
 
     assert result.success
-    assert "TIME_TRAVEL_SIGNAL" in result.output
+    assert "RESET_CONTEXT_SIGNAL" in result.output
     assert "The config file is at /src/config.yaml" in result.output
     assert "10" in result.output
 
 
 @pytest.mark.asyncio
-async def test_time_travel_tool_invalid_steps():
-    """Test time travel with invalid steps_back."""
-    tool = TimeTravelTool()
+async def test_reset_context_tool_invalid_steps():
+    """Test reset_context with invalid steps_back."""
+    tool = ResetContextTool()
 
     result = await tool.execute(
         learning="Some learning",
@@ -35,35 +35,35 @@ async def test_time_travel_tool_invalid_steps():
     assert not result.success
 
 
-def test_parse_time_travel_signal():
-    """Test parsing time travel signal from tool output."""
-    signal = "TIME_TRAVEL_SIGNAL::Found the bug in line 42::5"
+def test_parse_reset_context_signal():
+    """Test parsing reset_context signal from tool output."""
+    signal = "RESET_CONTEXT_SIGNAL::Found the bug in line 42::5"
 
-    request = parse_time_travel_signal(signal)
+    request = parse_reset_context_signal(signal)
 
     assert request is not None
     assert request.learning == "Found the bug in line 42"
     assert request.steps_back == 5
 
 
-def test_parse_time_travel_signal_not_a_signal():
+def test_parse_reset_context_signal_not_a_signal():
     """Test parsing non-signal output."""
     output = "Just some normal tool output"
 
-    request = parse_time_travel_signal(output)
+    request = parse_reset_context_signal(output)
 
     assert request is None
 
 
 def test_tool_schema():
     """Test tool schema generation."""
-    tool = TimeTravelTool()
+    tool = ResetContextTool()
 
     anthropic_schema = tool.to_anthropic_schema()
-    assert anthropic_schema["name"] == "time_travel"
+    assert anthropic_schema["name"] == "reset_context"
     assert "learning" in anthropic_schema["input_schema"]["properties"]
     assert "steps_back" in anthropic_schema["input_schema"]["properties"]
 
     openai_schema = tool.to_openai_schema()
     assert openai_schema["type"] == "function"
-    assert openai_schema["function"]["name"] == "time_travel"
+    assert openai_schema["function"]["name"] == "reset_context"

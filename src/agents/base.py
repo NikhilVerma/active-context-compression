@@ -37,7 +37,7 @@ class AgentMetrics:
     total_output_tokens: int = 0
     llm_calls: int = 0
     tool_calls: int = 0
-    time_travels: int = 0
+    compressions: int = 0
     messages_dropped: int = 0
     wall_time_seconds: float = 0.0
 

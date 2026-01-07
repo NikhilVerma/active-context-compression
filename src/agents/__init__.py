@@ -2,6 +2,7 @@
 
 from .base import Agent, AgentMetrics, Message, MessageRole, TaskResult
 from .baseline import BaselineAgent
+from .focus import FocusAgent
 from .time_travel import TimeTravelAgent
 
 __all__ = [
@@ -12,4 +13,5 @@ __all__ = [
     "TaskResult",
     "BaselineAgent",
     "TimeTravelAgent",
+    "FocusAgent",
 ]

@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Run the mini benchmark comparing baseline vs time travel agents."""
+"""Run the mini benchmark with the focus agent.
+
+The focus agent uses start_focus/complete_focus for structured context compression.
+"""
 
 import argparse
 import asyncio
@@ -11,8 +14,9 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
+from rich.table import Table
 
-from src.agents import BaselineAgent, TimeTravelAgent
+from src.agents import BaselineAgent, FocusAgent
 from src.benchmarks import (
     cleanup_workspace,
     create_workspace_for_problem,
@@ -28,6 +32,8 @@ async def run_problem(
     model: str,
     provider: str,
     console: Console,
+    auto_focus: bool = True,
+    steps_per_focus: int = 15,
 ) -> tuple[bool, dict]:
     """Run a single problem with an agent."""
     workspace = create_workspace_for_problem(problem)
@@ -44,10 +50,13 @@ async def run_problem(
                 provider=provider,
             )
         else:
-            agent = TimeTravelAgent(
+            agent = FocusAgent(
                 model=model,
                 tools=tools,
                 provider=provider,
+                auto_focus=auto_focus,
+                steps_per_focus=steps_per_focus,
+                console=console,
             )
 
         # Run the agent
@@ -63,7 +72,7 @@ async def run_problem(
 
 
 async def main():
-    parser = argparse.ArgumentParser(description="Run mini benchmark")
+    parser = argparse.ArgumentParser(description="Run focus agent benchmark")
     parser.add_argument(
         "--model",
         default="claude-haiku-4-5-20251001",
@@ -92,9 +101,20 @@ async def main():
         help="Only run baseline agent",
     )
     parser.add_argument(
-        "--time-travel-only",
+        "--focus-only",
         action="store_true",
-        help="Only run time travel agent",
+        help="Only run focus agent",
+    )
+    parser.add_argument(
+        "--steps-per-focus",
+        type=int,
+        default=15,
+        help="Auto-complete focus after N steps (default: 15)",
+    )
+    parser.add_argument(
+        "--no-auto-focus",
+        action="store_true",
+        help="Disable auto-focus management (let model use tools naturally)",
     )
 
     args = parser.parse_args()
@@ -110,17 +130,18 @@ async def main():
         return
 
     console.print(f"[bold]Running {len(problems)} problems with model {args.model}[/bold]")
+    console.print("[dim]Testing focus-based context compression[/dim]")
     console.print()
 
     # Determine which agents to run
     agent_types = []
-    if not args.time_travel_only:
+    if not args.focus_only:
         agent_types.append("baseline")
     if not args.baseline_only:
-        agent_types.append("time_travel")
+        agent_types.append("focus")
 
     # Initialize metrics tracker
-    tracker = MetricsTracker(benchmark_name="mini", model=args.model)
+    tracker = MetricsTracker(benchmark_name="mini_focus", model=args.model)
 
     # Run each problem with each agent type
     with Progress(
@@ -140,6 +161,8 @@ async def main():
                         model=args.model,
                         provider=args.provider,
                         console=console,
+                        auto_focus=not args.no_auto_focus,
+                        steps_per_focus=args.steps_per_focus,
                     )
 
                     tracker.record_run(
@@ -154,6 +177,9 @@ async def main():
 
                 except Exception as e:
                     console.print(f"[red]Error running {problem.id} with {agent_type}: {e}[/red]")
+                    import traceback
+
+                    traceback.print_exc()
                     tracker.record_run(
                         problem_id=problem.id,
                         agent_type=agent_type,
@@ -170,6 +196,27 @@ async def main():
 
     # Print comparison report
     print_comparison_report(tracker.results)
+
+    # Print focus-specific metrics if we ran focus agent
+    if "focus" in agent_types:
+        console.print("\n[bold]Focus Agent Metrics:[/bold]")
+        focus_runs = [r for r in tracker.results.runs if r.agent_type == "focus"]
+
+        table = Table()
+        table.add_column("Problem")
+        table.add_column("Knowledge Entries")
+        table.add_column("Messages Dropped")
+        table.add_column("Compressions")
+
+        for run in focus_runs:
+            table.add_row(
+                run.problem_id,
+                str(getattr(run, "knowledge_entries", 0)),
+                str(run.messages_dropped),
+                str(run.compressions),
+            )
+
+        console.print(table)
 
 
 if __name__ == "__main__":

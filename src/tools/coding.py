@@ -215,10 +215,8 @@ class RunCommandTool(Tool):
             )
 
             try:
-                stdout, stderr = await asyncio.wait_for(
-                    process.communicate(), timeout=self.timeout
-                )
-            except asyncio.TimeoutError:
+                stdout, stderr = await asyncio.wait_for(process.communicate(), timeout=self.timeout)
+            except TimeoutError:
                 process.kill()
                 return ToolResult(
                     success=False,
@@ -274,10 +272,10 @@ class SearchFilesTool(Tool):
             matches = list(self.workspace_root.glob(pattern))
             # Make paths relative
             relative_paths = [
-                str(p.relative_to(self.workspace_root))
-                for p in matches
-                if p.is_file()
-            ][:100]  # Limit results
+                str(p.relative_to(self.workspace_root)) for p in matches if p.is_file()
+            ][
+                :100
+            ]  # Limit results
 
             if not relative_paths:
                 return ToolResult(success=True, output="No files found matching pattern.")

@@ -1,18 +1,19 @@
 """Tests for the mini benchmark problems."""
 
-import pytest
-from pathlib import Path
-import tempfile
 import shutil
+import tempfile
+from pathlib import Path
+
+import pytest
 
 from src.benchmarks.mini import (
-    setup_hidden_config,
-    check_hidden_config,
-    setup_bug_hunt,
     check_bug_hunt,
-    setup_dependency_maze,
     check_dependency_maze,
+    check_hidden_config,
     get_mini_benchmark,
+    setup_bug_hunt,
+    setup_dependency_maze,
+    setup_hidden_config,
 )
 
 
@@ -65,7 +66,7 @@ class TestBugHunt:
         content = calc_path.read_text()
         fixed_content = content.replace(
             "def divide(a, b):\n    # BUG: Should check for zero division\n    return a / b",
-            "def divide(a, b):\n    if b == 0:\n        raise ValueError('Cannot divide by zero')\n    return a / b"
+            "def divide(a, b):\n    if b == 0:\n        raise ValueError('Cannot divide by zero')\n    return a / b",
         )
         calc_path.write_text(fixed_content)
 

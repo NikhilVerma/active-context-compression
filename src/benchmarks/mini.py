@@ -6,8 +6,8 @@ These problems are designed to benefit from exploration and backtracking:
 - Red herrings that waste context if not pruned
 """
 
-import tempfile
 import shutil
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -37,7 +37,9 @@ def setup_hidden_config(workspace: Path) -> None:
 
     # Red herring directory structure
     (workspace / "src").mkdir()
-    (workspace / "src" / "config.py").write_text("# This just imports from somewhere else\nfrom core.settings import *")
+    (workspace / "src" / "config.py").write_text(
+        "# This just imports from somewhere else\nfrom core.settings import *"
+    )
     (workspace / "src" / "core").mkdir()
     (workspace / "src" / "core" / "settings.py").write_text("# Deprecated, see infrastructure/")
 
@@ -49,12 +51,18 @@ def setup_hidden_config(workspace: Path) -> None:
 
     # The actual config
     (workspace / ".secrets").mkdir()
-    (workspace / ".secrets" / "production.env").write_text("DATABASE_URL=postgres://prod:5432/db\nAPI_KEY=sk-12345")
+    (workspace / ".secrets" / "production.env").write_text(
+        "DATABASE_URL=postgres://prod:5432/db\nAPI_KEY=sk-12345"
+    )
 
 
 def check_hidden_config(workspace: Path, output: str) -> bool:
     """Check if the agent found the real config."""
-    return "postgres://prod:5432/db" in output or "sk-12345" in output or ".secrets/production.env" in output
+    return (
+        "postgres://prod:5432/db" in output
+        or "sk-12345" in output
+        or ".secrets/production.env" in output
+    )
 
 
 def setup_bug_hunt(workspace: Path) -> None:
@@ -65,7 +73,8 @@ def setup_bug_hunt(workspace: Path) -> None:
     (workspace / "src").mkdir()
 
     # Main file with the bug
-    (workspace / "src" / "calculator.py").write_text('''
+    (workspace / "src" / "calculator.py").write_text(
+        """
 def add(a, b):
     return a + b
 
@@ -81,10 +90,12 @@ def divide(a, b):
 
 def power(a, b):
     return a ** b
-''')
+"""
+    )
 
     # Test file that reveals the bug
-    (workspace / "src" / "test_calculator.py").write_text('''
+    (workspace / "src" / "test_calculator.py").write_text(
+        """
 import pytest
 from calculator import add, subtract, multiply, divide, power
 
@@ -107,19 +118,23 @@ def test_divide_by_zero():
 
 def test_power():
     assert power(2, 3) == 8
-''')
+"""
+    )
 
     # Red herrings
-    (workspace / "src" / "utils.py").write_text('''
+    (workspace / "src" / "utils.py").write_text(
+        """
 # This looks suspicious but is fine
 def parse_number(s):
     try:
         return int(s)
     except ValueError:
         return float(s)  # This is intentional
-''')
+"""
+    )
 
-    (workspace / "src" / "legacy.py").write_text('''
+    (workspace / "src" / "legacy.py").write_text(
+        """
 # DEPRECATED - do not modify
 # This code looks bad but is not used
 def old_divide(a, b):
@@ -127,7 +142,8 @@ def old_divide(a, b):
     for _ in range(b):
         result = result  # looks wrong but this file is not used
     return result
-''')
+"""
+    )
 
 
 def check_bug_hunt(workspace: Path, output: str) -> bool:
@@ -137,7 +153,12 @@ def check_bug_hunt(workspace: Path, output: str) -> bool:
         return False
     content = calc_path.read_text()
     # Should have added zero check
-    return ("if b == 0" in content or "b == 0" in content or "ZeroDivisionError" in content or "ValueError" in content) and "divide" in content
+    return (
+        "if b == 0" in content
+        or "b == 0" in content
+        or "ZeroDivisionError" in content
+        or "ValueError" in content
+    ) and "divide" in content
 
 
 def setup_dependency_maze(workspace: Path) -> None:
@@ -148,15 +169,18 @@ def setup_dependency_maze(workspace: Path) -> None:
     """
     (workspace / "src").mkdir()
 
-    (workspace / "requirements.txt").write_text('''
+    (workspace / "requirements.txt").write_text(
+        """
 flask==2.0.1
 requests==2.28.0
 numpy==1.24.0
 pandas==2.0.0
 cryptography==3.4.8
-''')
+"""
+    )
 
-    (workspace / "src" / "app.py").write_text('''
+    (workspace / "src" / "app.py").write_text(
+        """
 from flask import Flask
 import requests
 import numpy as np
@@ -170,9 +194,11 @@ def hello():
     # This fails because cryptography 3.4.8 has a known issue with Python 3.11+
     key = Fernet.generate_key()
     return "Hello"
-''')
+"""
+    )
 
-    (workspace / "error.log").write_text('''
+    (workspace / "error.log").write_text(
+        """
 Traceback (most recent call last):
   File "app.py", line 5, in <module>
     from cryptography.fernet import Fernet
@@ -183,15 +209,18 @@ Traceback (most recent call last):
 ImportError: /usr/lib/python3.11/site-packages/cryptography/hazmat/bindings/_rust.abi3.so: undefined symbol: EVP_MD_CTX_new
 
 Note: This is a known issue with cryptography < 38.0.0 on Python 3.11+
-''')
+"""
+    )
 
     # Red herrings in the error logs
-    (workspace / "debug.log").write_text('''
+    (workspace / "debug.log").write_text(
+        """
 WARNING: numpy version 1.24.0 deprecates some APIs
 WARNING: pandas 2.0.0 changed default behavior for some operations
 INFO: flask development server running
 ERROR: requests connection timeout (unrelated network issue)
-''')
+"""
+    )
 
 
 def check_dependency_maze(workspace: Path, output: str) -> bool:
@@ -201,7 +230,14 @@ def check_dependency_maze(workspace: Path, output: str) -> bool:
         return False
     content = req_path.read_text()
     # Should have updated cryptography version
-    return "cryptography>=38" in content or "cryptography==38" in content or "cryptography==39" in content or "cryptography==40" in content or "cryptography==41" in content or "cryptography>=41" in content
+    return (
+        "cryptography>=38" in content
+        or "cryptography==38" in content
+        or "cryptography==39" in content
+        or "cryptography==40" in content
+        or "cryptography==41" in content
+        or "cryptography>=41" in content
+    )
 
 
 def setup_refactor_challenge(workspace: Path) -> None:
@@ -214,39 +250,45 @@ def setup_refactor_challenge(workspace: Path) -> None:
     (workspace / "src" / "handlers").mkdir()
 
     # Duplicated validation logic across files
-    validation_code = '''
+    validation_code = """
 def validate_email(email):
     import re
     pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+[.][a-zA-Z0-9-.]+$"
     return bool(re.match(pattern, email))
-'''
+"""
 
-    (workspace / "src" / "handlers" / "user_handler.py").write_text(f'''
+    (workspace / "src" / "handlers" / "user_handler.py").write_text(
+        f"""
 {validation_code}
 
 def create_user(email, name):
     if not validate_email(email):
         raise ValueError("Invalid email")
     return {{"email": email, "name": name}}
-''')
+"""
+    )
 
-    (workspace / "src" / "handlers" / "admin_handler.py").write_text(f'''
+    (workspace / "src" / "handlers" / "admin_handler.py").write_text(
+        f"""
 {validation_code}
 
 def create_admin(email, permissions):
     if not validate_email(email):
         raise ValueError("Invalid email")
     return {{"email": email, "permissions": permissions, "is_admin": True}}
-''')
+"""
+    )
 
-    (workspace / "src" / "handlers" / "guest_handler.py").write_text(f'''
+    (workspace / "src" / "handlers" / "guest_handler.py").write_text(
+        f"""
 {validation_code}
 
 def create_guest(email):
     if not validate_email(email):
         raise ValueError("Invalid email")
     return {{"email": email, "is_guest": True}}
-''')
+"""
+    )
 
     (workspace / "src" / "handlers" / "__init__.py").write_text("")
 
@@ -268,11 +310,12 @@ def check_refactor_challenge(workspace: Path, output: str) -> bool:
     admin_handler = (workspace / "src" / "handlers" / "admin_handler.py").read_text()
 
     # Should have imports, not inline definitions
-    has_imports = ("from src" in user_handler or "from .." in user_handler or "import" in user_handler) and \
-                  ("from src" in admin_handler or "from .." in admin_handler or "import" in admin_handler)
+    has_imports = (
+        "from src" in user_handler or "from .." in user_handler or "import" in user_handler
+    ) and ("from src" in admin_handler or "from .." in admin_handler or "import" in admin_handler)
 
     # Definition should not be in handlers anymore
-    no_inline_def = user_handler.count("def validate_email") <= 1 or "import" in user_handler
+    # (checking this is removed as validation was overly strict)
 
     return shared_file_exists and has_imports
 
@@ -285,7 +328,8 @@ def setup_test_failure_investigation(workspace: Path) -> None:
     """
     (workspace / "src").mkdir()
 
-    (workspace / "src" / "cache.py").write_text('''
+    (workspace / "src" / "cache.py").write_text(
+        '''
 import time
 
 _cache = {}
@@ -308,9 +352,11 @@ def clear_cache():
     """Clear the cache."""
     global _cache
     _cache = {}
-''')
+'''
+    )
 
-    (workspace / "src" / "service.py").write_text('''
+    (workspace / "src" / "service.py").write_text(
+        """
 from cache import get_cached, set_cached
 
 def get_user_data(user_id):
@@ -322,9 +368,11 @@ def get_user_data(user_id):
     data = {"id": user_id, "name": f"User {user_id}"}
     set_cached(f"user:{user_id}", data)
     return data
-''')
+"""
+    )
 
-    (workspace / "src" / "test_service.py").write_text('''
+    (workspace / "src" / "test_service.py").write_text(
+        '''
 import time
 from cache import clear_cache, set_cached, get_cached
 from service import get_user_data
@@ -353,9 +401,11 @@ def test_cache_hit():
 def test_cache_miss():
     clear_cache()
     assert get_cached("nonexistent") is None
-''')
+'''
+    )
 
-    (workspace / "CI_LOG.txt").write_text('''
+    (workspace / "CI_LOG.txt").write_text(
+        """
 Run 1: test_cache_hit PASSED
 Run 2: test_cache_hit PASSED
 Run 3: test_cache_hit FAILED - AssertionError
@@ -365,7 +415,8 @@ Run 6: test_cache_hit PASSED
 
 The test is flaky. Sometimes passes, sometimes fails.
 No code changes between runs.
-''')
+"""
+    )
 
 
 def check_test_failure_investigation(workspace: Path, output: str) -> bool:

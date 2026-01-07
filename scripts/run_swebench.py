@@ -3,22 +3,22 @@
 
 import argparse
 import asyncio
+import shutil
 import sys
 import tempfile
-import shutil
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from rich.console import Console
-from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn
+from rich.progress import BarColumn, Progress, SpinnerColumn, TaskProgressColumn, TextColumn
 
 from src.agents import BaselineAgent, TimeTravelAgent
 from src.benchmarks import (
-    load_swebench_lite,
-    setup_swebench_workspace,
     check_swebench_solution,
     get_task_prompt,
+    load_swebench_lite,
+    setup_swebench_workspace,
 )
 from src.metrics import MetricsTracker, print_comparison_report
 from src.tools import get_coding_tools
@@ -80,8 +80,8 @@ async def main():
     parser = argparse.ArgumentParser(description="Run SWE-bench Lite benchmark")
     parser.add_argument(
         "--model",
-        default="claude-sonnet-4-20250514",
-        help="Model to use (default: claude-sonnet-4-20250514)",
+        default="claude-haiku-4-5-20251001",
+        help="Model to use (default: claude-haiku-4-5-20251001)",
     )
     parser.add_argument(
         "--provider",
@@ -131,7 +131,9 @@ async def main():
         console.print("[red]No instances to run![/red]")
         return
 
-    console.print(f"[bold]Running {len(instances)} SWE-bench instances with model {args.model}[/bold]")
+    console.print(
+        f"[bold]Running {len(instances)} SWE-bench instances with model {args.model}[/bold]"
+    )
     console.print()
 
     # Determine which agents to run

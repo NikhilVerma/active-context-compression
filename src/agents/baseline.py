@@ -10,7 +10,7 @@ import openai
 
 from src.tools import Tool
 
-from .base import Agent, AgentMetrics, Message, MessageRole, TaskResult
+from .base import Agent, Message, MessageRole, TaskResult
 
 
 class BaselineAgent(Agent):
@@ -22,7 +22,7 @@ class BaselineAgent(Agent):
 
     def __init__(
         self,
-        model: str = "claude-sonnet-4-20250514",
+        model: str = "claude-haiku-4-5-20251001",
         tools: list[Tool] | None = None,
         max_steps: int = 50,
         temperature: float = 0.0,
@@ -48,8 +48,7 @@ class BaselineAgent(Agent):
 
 Workspace: {workspace}
 
-You have access to tools to read files, write files, run commands, and search.
-Work step by step to understand the problem and implement a solution.
+You have access to various tools. Use them to explore the codebase, understand the problem, and implement a solution.
 When you're done, respond with TASK_COMPLETE and a summary of what you did."""
 
         self._add_message(Message(role=MessageRole.SYSTEM, content=system_prompt))
@@ -72,9 +71,7 @@ When you're done, respond with TASK_COMPLETE and a summary of what you did."""
             # Handle tool calls
             if response.tool_calls:
                 for tool_call in response.tool_calls:
-                    result = await self._execute_tool(
-                        tool_call["name"], tool_call["arguments"]
-                    )
+                    result = await self._execute_tool(tool_call["name"], tool_call["arguments"])
                     self._add_message(
                         Message(
                             role=MessageRole.TOOL,
@@ -126,22 +123,28 @@ When you're done, respond with TASK_COMPLETE and a summary of what you did."""
                 if msg.content:
                     content.append({"type": "text", "text": msg.content})
                 for tc in msg.tool_calls:
-                    content.append({
-                        "type": "tool_use",
-                        "id": tc["id"],
-                        "name": tc["name"],
-                        "input": tc["arguments"],
-                    })
+                    content.append(
+                        {
+                            "type": "tool_use",
+                            "id": tc["id"],
+                            "name": tc["name"],
+                            "input": tc["arguments"],
+                        }
+                    )
                 api_messages.append({"role": "assistant", "content": content})
             elif msg.role == MessageRole.TOOL:
-                api_messages.append({
-                    "role": "user",
-                    "content": [{
-                        "type": "tool_result",
-                        "tool_use_id": msg.tool_call_id,
-                        "content": msg.content,
-                    }],
-                })
+                api_messages.append(
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "tool_result",
+                                "tool_use_id": msg.tool_call_id,
+                                "content": msg.content,
+                            }
+                        ],
+                    }
+                )
 
         tools = [t.to_anthropic_schema() for t in self.tools]
 
@@ -166,11 +169,13 @@ When you're done, respond with TASK_COMPLETE and a summary of what you did."""
             if block.type == "text":
                 text_content = block.text
             elif block.type == "tool_use":
-                tool_calls.append({
-                    "id": block.id,
-                    "name": block.name,
-                    "arguments": block.input,
-                })
+                tool_calls.append(
+                    {
+                        "id": block.id,
+                        "name": block.name,
+                        "arguments": block.input,
+                    }
+                )
 
         return Message(
             role=MessageRole.ASSISTANT,
@@ -203,11 +208,13 @@ When you're done, respond with TASK_COMPLETE and a summary of what you did."""
                     ]
                 api_messages.append(m)
             elif msg.role == MessageRole.TOOL:
-                api_messages.append({
-                    "role": "tool",
-                    "tool_call_id": msg.tool_call_id,
-                    "content": msg.content,
-                })
+                api_messages.append(
+                    {
+                        "role": "tool",
+                        "tool_call_id": msg.tool_call_id,
+                        "content": msg.content,
+                    }
+                )
 
         tools = [t.to_openai_schema() for t in self.tools] if self.tools else None
 
@@ -230,11 +237,13 @@ When you're done, respond with TASK_COMPLETE and a summary of what you did."""
         tool_calls = []
         if message.tool_calls:
             for tc in message.tool_calls:
-                tool_calls.append({
-                    "id": tc.id,
-                    "name": tc.function.name,
-                    "arguments": json.loads(tc.function.arguments),
-                })
+                tool_calls.append(
+                    {
+                        "id": tc.id,
+                        "name": tc.function.name,
+                        "arguments": json.loads(tc.function.arguments),
+                    }
+                )
 
         return Message(
             role=MessageRole.ASSISTANT,
@@ -249,7 +258,7 @@ When you're done, respond with TASK_COMPLETE and a summary of what you did."""
             "total_output_tokens": self.metrics.total_output_tokens,
             "llm_calls": self.metrics.llm_calls,
             "tool_calls": self.metrics.tool_calls,
-            "time_travels": self.metrics.time_travels,
+            "compressions": self.metrics.compressions,
             "messages_dropped": self.metrics.messages_dropped,
             "wall_time_seconds": self.metrics.wall_time_seconds,
             "message_count": len(self.messages),

@@ -1,7 +1,6 @@
 """SWE-bench Lite benchmark loader."""
 
 import subprocess
-import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 

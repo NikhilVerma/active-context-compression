@@ -9,7 +9,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from rich.console import Console
 
-from src.metrics import load_and_compare, BenchmarkResults, generate_markdown_report
+from src.metrics import BenchmarkResults, generate_markdown_report, load_and_compare
 
 
 def main():

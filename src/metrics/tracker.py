@@ -1,7 +1,7 @@
 """Metrics tracking for benchmark runs."""
 
 import json
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -12,7 +12,7 @@ class RunMetrics:
     """Metrics for a single agent run."""
 
     problem_id: str
-    agent_type: str  # "baseline" or "time_travel"
+    agent_type: str  # "baseline" or "focus"
     model: str
     success: bool
     error: str | None = None
@@ -28,8 +28,8 @@ class RunMetrics:
     wall_time_seconds: float = 0.0
     message_count: int = 0
 
-    # Time travel specific
-    time_travels: int = 0
+    # Focus-specific metrics
+    compressions: int = 0
     messages_dropped: int = 0
 
     # Metadata
@@ -53,14 +53,14 @@ class BenchmarkResults:
         """Get all baseline runs."""
         return [r for r in self.runs if r.agent_type == "baseline"]
 
-    def get_time_travel_runs(self) -> list[RunMetrics]:
-        """Get all time travel runs."""
-        return [r for r in self.runs if r.agent_type == "time_travel"]
+    def get_focus_runs(self) -> list[RunMetrics]:
+        """Get all focus runs (including legacy 'time_travel' agent_type)."""
+        return [r for r in self.runs if r.agent_type in ["time_travel", "focus"]]
 
     def calculate_summary(self) -> dict[str, Any]:
         """Calculate summary statistics."""
         baseline = self.get_baseline_runs()
-        time_travel = self.get_time_travel_runs()
+        focus = self.get_focus_runs()
 
         def summarize(runs: list[RunMetrics]) -> dict[str, Any]:
             if not runs:
@@ -80,26 +80,30 @@ class BenchmarkResults:
             }
 
         baseline_summary = summarize(baseline)
-        tt_summary = summarize(time_travel)
+        focus_summary = summarize(focus)
 
-        # Add time travel specific metrics
-        if time_travel:
-            tt_summary["avg_time_travels"] = sum(r.time_travels for r in time_travel) / len(time_travel)
-            tt_summary["avg_messages_dropped"] = sum(r.messages_dropped for r in time_travel) / len(time_travel)
+        # Add focus-specific metrics
+        if focus:
+            focus_summary["avg_compressions"] = sum(r.compressions for r in focus) / len(
+                focus
+            )
+            focus_summary["avg_messages_dropped"] = sum(r.messages_dropped for r in focus) / len(
+                focus
+            )
 
         # Calculate deltas
         deltas = {}
-        if baseline_summary and tt_summary:
+        if baseline_summary and focus_summary:
             for key in ["success_rate", "avg_total_tokens", "avg_llm_calls", "avg_wall_time"]:
-                if key in baseline_summary and key in tt_summary:
+                if key in baseline_summary and key in focus_summary:
                     baseline_val = baseline_summary[key]
-                    tt_val = tt_summary[key]
+                    focus_val = focus_summary[key]
                     if baseline_val != 0:
-                        deltas[f"{key}_delta_pct"] = ((tt_val - baseline_val) / baseline_val) * 100
+                        deltas[f"{key}_delta_pct"] = ((focus_val - baseline_val) / baseline_val) * 100
 
         return {
             "baseline": baseline_summary,
-            "time_travel": tt_summary,
+            "focus": focus_summary,
             "deltas": deltas,
         }
 
@@ -156,12 +160,14 @@ class MetricsTracker:
             error=error,
             input_tokens=metrics.get("total_input_tokens", 0),
             output_tokens=metrics.get("total_output_tokens", 0),
-            total_tokens=metrics.get("total_input_tokens", 0) + metrics.get("total_output_tokens", 0),
+            total_tokens=metrics.get("total_input_tokens", 0)
+            + metrics.get("total_output_tokens", 0),
             llm_calls=metrics.get("llm_calls", 0),
             tool_calls=metrics.get("tool_calls", 0),
             wall_time_seconds=metrics.get("wall_time_seconds", 0.0),
             message_count=metrics.get("message_count", 0),
-            time_travels=metrics.get("time_travels", 0),
+            # Backward compatibility: try compressions first, fall back to time_travels
+            compressions=metrics.get("compressions", metrics.get("time_travels", 0)),
             messages_dropped=metrics.get("messages_dropped", 0),
         )
 

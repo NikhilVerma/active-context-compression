@@ -12,7 +12,7 @@ class ToolResult(BaseModel):
     success: bool
     output: str
     error: str | None = None
-    is_time_travel: bool = False  # Signal that time travel was executed
+    is_compression: bool = False  # Signal that context compression was executed
 
 
 class Tool(ABC):
