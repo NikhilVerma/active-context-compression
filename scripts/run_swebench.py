@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run SWE-bench Lite benchmark comparing baseline vs time travel agents."""
+"""Run SWE-bench Lite benchmark comparing baseline vs focus agents."""
 
 import argparse
 import asyncio
@@ -116,6 +116,7 @@ async def main():
     )
     parser.add_argument(
         "--instance-ids",
+
         nargs="+",
         help="Specific instance IDs to run",
     )

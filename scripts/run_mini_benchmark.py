@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the mini benchmark comparing baseline vs time travel agents."""
+"""Run the mini benchmark comparing baseline vs focus agents."""
 
 import argparse
 import asyncio
@@ -12,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
-from src.agents import BaselineAgent, TimeTravelAgent
+from src.agents import BaselineAgent, FocusAgent
 from src.benchmarks import (
     cleanup_workspace,
     create_workspace_for_problem,
@@ -44,10 +44,13 @@ async def run_problem(
                 provider=provider,
             )
         else:
-            agent = TimeTravelAgent(
+            agent = FocusAgent(
                 model=model,
                 tools=tools,
                 provider=provider,
+                auto_focus=True,
+                steps_per_focus=15,
+                console=console,
             )
 
         # Run the agent
@@ -92,9 +95,9 @@ async def main():
         help="Only run baseline agent",
     )
     parser.add_argument(
-        "--time-travel-only",
+        "--focus-only",
         action="store_true",
-        help="Only run time travel agent",
+        help="Only run focus agent",
     )
 
     args = parser.parse_args()
@@ -114,10 +117,10 @@ async def main():
 
     # Determine which agents to run
     agent_types = []
-    if not args.time_travel_only:
+    if not args.focus_only:
         agent_types.append("baseline")
     if not args.baseline_only:
-        agent_types.append("time_travel")
+        agent_types.append("focus")
 
     # Initialize metrics tracker
     tracker = MetricsTracker(benchmark_name="mini", model=args.model)

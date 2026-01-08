@@ -1,0 +1,32 @@
+warning: `VIRTUAL_ENV=/Users/nikhilverma/.venv` does not match the project environment path `.venv` and will be ignored; use `--active` to target the active environment instead
+Loading SWE-bench Lite dataset...
+Running 1 SWE-bench instances with model claude-sonnet-4-5-20250929
+
+   flask-5063 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100%
+
+Results saved to 
+results/swebench_lite_claude-sonnet-4-5-20250929_2026-01-07T22-47-58.862552.json
+
+Benchmark Results: swebench_lite
+Model: claude-sonnet-4-5-20250929
+Timestamp: 2026-01-07T22:47:58.862552
+
+                Agent Comparison                 
+┏━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━┳━━━━━━━┓
+┃ Metric            ┃  Baseline ┃ Focus ┃ Delta ┃
+┡━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━╇━━━━━━━┩
+│ Success Rate      │      0.0% │  0.0% │     - │
+│ Avg Total Tokens  │ 3,951,993 │     0 │     - │
+│ Avg LLM Calls     │      70.0 │     0 │     - │
+│ Avg Tool Calls    │      69.0 │     0 │     - │
+│ Avg Wall Time (s) │     770.9 │     0 │     - │
+│ Avg Messages      │     141.0 │     0 │     - │
+└───────────────────┴───────────┴───────┴───────┘
+
+           Per-Problem Results            
+┏━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┓
+┃ Problem             ┃ Baseline ┃ Focus ┃
+┡━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━┩
+│ pallets__flask-5063 │    ✗     │   ✗   │
+└─────────────────────┴──────────┴───────┘
+

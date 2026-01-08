@@ -55,8 +55,8 @@ class BenchmarkResults:
         return [r for r in self.runs if r.agent_type == "baseline"]
 
     def get_focus_runs(self) -> list[RunMetrics]:
-        """Get all focus runs (including legacy 'time_travel' agent_type)."""
-        return [r for r in self.runs if r.agent_type in ["time_travel", "focus"]]
+        """Get all focus runs."""
+        return [r for r in self.runs if r.agent_type == "focus"]
 
     def calculate_summary(self) -> dict[str, Any]:
         """Calculate summary statistics."""
@@ -175,8 +175,9 @@ class MetricsTracker:
             tool_calls=metrics.get("tool_calls", 0),
             wall_time_seconds=metrics.get("wall_time_seconds", 0.0),
             message_count=metrics.get("message_count", 0),
-            # Backward compatibility: try compressions first, fall back to time_travels
-            compressions=metrics.get("compressions", metrics.get("time_travels", 0)),
+            
+            # Focus metrics
+            compressions=metrics.get("compressions", 0),
             messages_dropped=metrics.get("messages_dropped", 0),
             knowledge_entries=metrics.get("knowledge_entries", 0),
         )
