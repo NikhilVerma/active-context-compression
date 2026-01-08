@@ -1,4 +1,4 @@
-"""Baseline agent without time travel capabilities."""
+"""Baseline agent without focus capabilities."""
 
 import json
 import time
@@ -14,10 +14,11 @@ from .base import Agent, Message, MessageRole, TaskResult
 
 
 class BaselineAgent(Agent):
-    """Standard agent that keeps all context.
+    """Standard agent that accumulates context linearly.
 
-    This is the control group - it uses the same tools and model
-    but cannot drop context or time travel.
+    This agent serves as the control group. It has access to the same
+    tools (coding, etc.) as the FocusAgent but cannot drop context or focus.
+    It simply appends messages until it hits the context limit.
     """
 
     def __init__(
