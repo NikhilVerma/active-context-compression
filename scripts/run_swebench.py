@@ -13,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from rich.console import Console
 from rich.progress import BarColumn, Progress, SpinnerColumn, TaskProgressColumn, TextColumn
 
-from src.agents import BaselineAgent, TimeTravelAgent
+from src.agents import BaselineAgent, FocusAgent
 from src.benchmarks import (
     check_swebench_solution,
     get_task_prompt,
@@ -51,11 +51,14 @@ async def run_instance(
                 max_steps=75,  # SWE-bench problems are harder
             )
         else:
-            agent = TimeTravelAgent(
+            agent = FocusAgent(
                 model=model,
                 tools=tools,
                 provider=provider,
                 max_steps=75,
+                auto_focus=True,
+                steps_per_focus=15,  # Consistent with mini benchmark
+                console=Console(),
             )
 
         # Get the task prompt
@@ -107,9 +110,9 @@ async def main():
         help="Only run baseline agent",
     )
     parser.add_argument(
-        "--time-travel-only",
+        "--focus-only",
         action="store_true",
-        help="Only run time travel agent",
+        help="Only run focus agent",
     )
     parser.add_argument(
         "--instance-ids",
@@ -122,10 +125,8 @@ async def main():
 
     # Load SWE-bench Lite
     console.print("[dim]Loading SWE-bench Lite dataset...[/dim]")
-    instances = load_swebench_lite(limit=args.limit)
-
-    if args.instance_ids:
-        instances = [i for i in instances if i.instance_id in args.instance_ids]
+    # We pass instance_ids to load_swebench_lite so it can filter BEFORE limiting
+    instances = load_swebench_lite(limit=args.limit, instance_ids=args.instance_ids)
 
     if not instances:
         console.print("[red]No instances to run![/red]")
@@ -138,10 +139,10 @@ async def main():
 
     # Determine which agents to run
     agent_types = []
-    if not args.time_travel_only:
+    if not args.focus_only:
         agent_types.append("baseline")
     if not args.baseline_only:
-        agent_types.append("time_travel")
+        agent_types.append("focus")
 
     # Initialize metrics tracker
     tracker = MetricsTracker(benchmark_name="swebench_lite", model=args.model)

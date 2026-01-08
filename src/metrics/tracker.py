@@ -14,7 +14,7 @@ class RunMetrics:
     problem_id: str
     agent_type: str  # "baseline" or "focus"
     model: str
-    success: bool
+    success: float  # Changed from bool to float (0.0 - 1.0)
     error: str | None = None
 
     # Token usage
@@ -31,6 +31,7 @@ class RunMetrics:
     # Focus-specific metrics
     compressions: int = 0
     messages_dropped: int = 0
+    knowledge_entries: int = 0
 
     # Metadata
     timestamp: str = field(default_factory=lambda: datetime.now().isoformat())
@@ -66,10 +67,12 @@ class BenchmarkResults:
             if not runs:
                 return {}
 
-            successes = sum(1 for r in runs if r.success)
+            # success is now a float (0.0 to 1.0)
+            avg_success = sum(r.success for r in runs) / len(runs)
+            
             return {
                 "count": len(runs),
-                "success_rate": successes / len(runs),
+                "success_rate": avg_success,
                 "avg_input_tokens": sum(r.input_tokens for r in runs) / len(runs),
                 "avg_output_tokens": sum(r.output_tokens for r in runs) / len(runs),
                 "avg_total_tokens": sum(r.total_tokens for r in runs) / len(runs),
@@ -90,6 +93,9 @@ class BenchmarkResults:
             focus_summary["avg_messages_dropped"] = sum(r.messages_dropped for r in focus) / len(
                 focus
             )
+            focus_summary["avg_knowledge_entries"] = sum(
+                getattr(r, "knowledge_entries", 0) for r in focus
+            ) / len(focus)
 
         # Calculate deltas
         deltas = {}
@@ -147,16 +153,19 @@ class MetricsTracker:
         self,
         problem_id: str,
         agent_type: str,
-        success: bool,
+        success: float | bool,  # Allow float or bool
         metrics: dict[str, Any],
         error: str | None = None,
     ) -> RunMetrics:
         """Record a single run."""
+        # Convert bool to float (0.0 or 1.0)
+        success_val = float(success) if isinstance(success, bool) else success
+        
         run = RunMetrics(
             problem_id=problem_id,
             agent_type=agent_type,
             model=self.results.model,
-            success=success,
+            success=success_val,
             error=error,
             input_tokens=metrics.get("total_input_tokens", 0),
             output_tokens=metrics.get("total_output_tokens", 0),
@@ -169,6 +178,7 @@ class MetricsTracker:
             # Backward compatibility: try compressions first, fall back to time_travels
             compressions=metrics.get("compressions", metrics.get("time_travels", 0)),
             messages_dropped=metrics.get("messages_dropped", 0),
+            knowledge_entries=metrics.get("knowledge_entries", 0),
         )
 
         self.results.add_run(run)

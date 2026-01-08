@@ -177,7 +177,7 @@ When you're done with the entire task, respond with TASK_COMPLETE and a summary 
 
             # Check if we should auto-complete focus (before LLM call)
             if self._auto_focus and self._should_auto_complete_focus():
-                self._auto_complete_focus()
+                await self._auto_complete_focus()
 
             # Call LLM
             response = await self._call_llm(self.messages)
@@ -411,68 +411,22 @@ Your learnings have been saved to the KNOWLEDGE section above.
         self._handle_start_focus(description, goal)
         self._steps_in_current_focus = 0
 
-    def _auto_complete_focus(self) -> None:
-        """Programmatically complete the current focus with auto-generated summary."""
+    async def _auto_complete_focus(self) -> None:
+        """Trigger the agent to complete the focus itself."""
         if not self._focus_stack:
             return
 
-        # Generate learnings from recent messages
-        learnings = self._extract_learnings_from_messages()
-
-        focus_data = {
-            "outcome": "partial",
-            "learnings": learnings,
-            "next_action": "Continue with the task",
-        }
-
-        # This will truncate messages and add knowledge
-        self._handle_complete_focus(focus_data)
-
-        # Start a new focus for the next phase
-        self._auto_start_focus("Continuing work", "Complete remaining tasks")
-
-    def _extract_learnings_from_messages(self) -> str:
-        """Extract key learnings from recent messages for auto-compression."""
-        if not self._focus_stack:
-            return "No specific learnings captured."
-
-        focus = self._focus_stack[-1]
-        recent_messages = self.messages[focus.start_message_index :]
-
-        # Extract file paths and key findings
-        files_read = set()
-        files_written = set()
-        findings = []
-
-        for msg in recent_messages:
-            content = msg.content
-
-            # Look for file operations
-            if "read_file" in str(msg.name or ""):
-                # Try to extract file path from content
-                for word in content.split():
-                    if "/" in word and not word.startswith("http"):
-                        files_read.add(word.strip(".,;:'\"()[]`"))
-
-            if "write_file" in str(msg.name or "") or "edit_file" in str(msg.name or ""):
-                for word in content.split():
-                    if "/" in word and not word.startswith("http"):
-                        files_written.add(word.strip(".,;:'\"()[]`"))
-
-            # Look for error messages
-            if "error" in content.lower() and msg.role == MessageRole.TOOL:
-                # Truncate long error messages
-                error_snippet = content[:200] + "..." if len(content) > 200 else content
-                findings.append(f"Encountered: {error_snippet}")
-
-        parts = []
-        if files_read:
-            parts.append(f"Files examined: {', '.join(list(files_read)[:5])}")
-        if files_written:
-            parts.append(f"Files modified: {', '.join(list(files_written)[:5])}")
-        if findings:
-            parts.append("Findings: " + "; ".join(findings[:3]))
-
-        return (
-            " | ".join(parts) if parts else "Exploration completed, continuing with implementation."
+        # Instead of doing the work for the agent, we just tell it to do it.
+        # This avoids paying double token cost for a separate summarization call.
+        nudge = Message(
+            role=MessageRole.USER, 
+            content="[SYSTEM] You have been working on this focus for a while. Please consolidate your progress by calling the `complete_focus` tool now. Summarize your key findings and decide on the next steps."
         )
+        self._add_message(nudge)
+        
+        # Reset the counter so we don't nag it every single step if it takes a moment
+        self._steps_in_current_focus = 0
+
+    async def _extract_learnings_from_messages(self) -> str:
+        # This method is no longer used in the new flow but kept for compatibility
+        return "Learnings extracted by agent."
