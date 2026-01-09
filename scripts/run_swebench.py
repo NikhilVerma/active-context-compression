@@ -29,6 +29,7 @@ async def run_instance(
     instance,
     model: str,
     provider: str,
+    steps_per_focus: int = 15,
 ) -> tuple[bool, dict, str | None]:
     """Run a single SWE-bench instance with an agent."""
     # Create temporary workspace
@@ -57,7 +58,7 @@ async def run_instance(
                 provider=provider,
                 max_steps=75,
                 auto_focus=True,
-                steps_per_focus=15,  # Consistent with mini benchmark
+                steps_per_focus=steps_per_focus,
                 console=Console(),
             )
 
@@ -68,7 +69,8 @@ async def run_instance(
         result = await agent.run(task, workspace)
 
         # Check if the solution passes tests
-        solution_correct = check_swebench_solution(instance, workspace)
+        solution_score = check_swebench_solution(instance, workspace)
+        solution_correct = solution_score == 1.0
 
         return solution_correct, result.metrics, None
 
@@ -116,9 +118,14 @@ async def main():
     )
     parser.add_argument(
         "--instance-ids",
-
         nargs="+",
         help="Specific instance IDs to run",
+    )
+    parser.add_argument(
+        "--steps-per-focus",
+        type=int,
+        default=15,
+        help="Number of steps before auto-completing focus (default: 15, set 0 for model-triggered)",
     )
 
     args = parser.parse_args()
@@ -171,6 +178,7 @@ async def main():
                         instance=instance,
                         model=args.model,
                         provider=args.provider,
+                        steps_per_focus=args.steps_per_focus,
                     )
 
                     tracker.record_run(

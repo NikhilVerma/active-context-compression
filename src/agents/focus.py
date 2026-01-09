@@ -404,6 +404,11 @@ Your learnings have been saved to the KNOWLEDGE section above.
         """Check if we should auto-complete the current focus."""
         if not self._focus_stack:
             return False
+        
+        # If steps_per_focus is None or 0, we rely on the model to decide (Model Triggered)
+        if not self._steps_per_focus:
+            return False
+            
         return self._steps_in_current_focus >= self._steps_per_focus
 
     def _auto_start_focus(self, description: str, goal: str) -> None:

@@ -135,15 +135,21 @@ def setup_swebench_workspace(instance: SWEBenchInstance, workspace: Path) -> boo
         for cmd in install_cmds:
             try:
                 subprocess.run(cmd, cwd=workspace, capture_output=True, timeout=300)
-            except Exception:
+            except subprocess.TimeoutExpired:
+                continue
+            except subprocess.CalledProcessError:
                 continue
 
         # Also install pytest if not present
         subprocess.run([pip_cmd, "install", "pytest"], cwd=workspace, capture_output=True)
 
         return True
-    except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
-        print(f"Failed to setup workspace for {instance.instance_id}: {e}")
+    except subprocess.TimeoutExpired as e:
+        print(f"Setup timed out for {instance.instance_id}: {e}")
+        return False
+    except subprocess.CalledProcessError as e:
+        print(f"Setup failed for {instance.instance_id}: {e}")
+        print(f"Stderr: {e.stderr.decode() if e.stderr else 'None'}")
         return False
 
 
@@ -173,7 +179,7 @@ def check_swebench_solution(instance: SWEBenchInstance, workspace: Path) -> floa
         # Use the venv python we set up
         venv_python = workspace / "venv" / "bin" / "python"
         if not venv_python.exists():
-            venv_python = Path(sys.executable) # Fallback to system python
+            raise RuntimeError(f"Virtual environment python not found at {venv_python}")
             
         result = subprocess.run(
             [str(venv_python), "-m", "pytest", "--tb=short"],
@@ -187,7 +193,7 @@ def check_swebench_solution(instance: SWEBenchInstance, workspace: Path) -> floa
         output = result.stdout + result.stderr
         
         # DEBUG: Print output to see what happened
-        print(f"\n[DEBUG] Pytest Output for {instance.instance_id}:\n{output}\n[DEBUG] End Pytest Output\n")
+        # logger.debug(f"Pytest Output for {instance.instance_id}: {len(output)} chars")
         
         # Regex to find "X passed, Y failed"
         import re

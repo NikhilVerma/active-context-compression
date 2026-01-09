@@ -20,8 +20,8 @@
 
 \author{\IEEEauthorblockN{Nikhil Verma}
 \IEEEauthorblockA{\textit{Independent Researcher} \\
-San Francisco, CA \\
-email@placeholder.com}
+Pune, India \\
+nikhilgotmail@gmail.com}
 }
 
 \maketitle
@@ -201,15 +201,15 @@ coordinates {
 \textbf{Improved Reasoning for Smaller Models:} Most significantly, Focus \textit{improved} success rates for Haiku by 50\%. This suggests that cognitive hygiene---keeping context clean and focused---is particularly valuable for less capable models that are more susceptible to distraction from accumulated noise. The compression mechanism not only preserves information but actively improves the model's ability to reason by reducing interference.
 
 \subsection{Ablation: Compression Frequency}
-We evaluated the effect of the \texttt{steps\_per\_focus} hyperparameter, which controls how frequently context is compressed. Preliminary experiments on our mini-benchmark suggest:
+We evaluate three compression strategies to understand the optimal balance between context retention and reduction:
 
 \begin{itemize}
-    \item \textbf{steps=10}: More aggressive compression. Higher token savings but risk of losing recent context before consolidation.
-    \item \textbf{steps=15} (default): Balanced approach. Allows sufficient exploration per focus while maintaining efficiency.
-    \item \textbf{steps=20+}: Diminishing returns. Context grows large before compression, reducing benefits.
+    \item \textbf{Fixed (15 steps)}: Aggressive compression to keep context lean.
+    \item \textbf{Fixed (30 steps)}: Relaxed compression to allow more local context.
+    \item \textbf{Model Triggered}: A fully autonomous mode where the agent decides when to consolidate context based on task completion, without external heuristics.
 \end{itemize}
 
-The optimal frequency likely depends on task complexity. Future work should explore adaptive triggers based on information density rather than fixed step counts.
+The optimal frequency likely depends on task complexity and the model's ability to self-regulate.
 
 \section{Discussion}
 \subsection{The Cost of Immortality}
@@ -221,7 +221,7 @@ For short, trivial tasks, this tax may outweigh the benefits. However, for long-
 Several limitations warrant discussion:
 
 \begin{enumerate}
-    \item \textbf{Sample Size:} Our evaluation uses N=10 (Haiku) and N=3 (Sonnet) instances. While sufficient to demonstrate both efficiency and reasoning benefits, larger-scale evaluation would strengthen statistical claims.
+    \item \textbf{Sample Size:} Our evaluation uses N=10 (Haiku) and N=3 (Sonnet) instances. While sufficient to demonstrate both efficiency and reasoning benefits, the high computational cost of evaluating long-horizon agentic workflows limited our current sample size. How these results generalize to the full benchmark over longer evaluation runs remains to be seen.
     
     \item \textbf{Heuristic Triggers:} The current implementation uses a time-based ``nudge'' (every 15 steps) to trigger compression. This simple heuristic works but may be suboptimal. Future work could explore adaptive triggers based on information density or task phase detection.
     
