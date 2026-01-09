@@ -291,6 +291,7 @@ When you're done with the entire task, respond with TASK_COMPLETE and a summary 
         if not self._focus_stack:
             return ToolResult(
                 success=False,
+                output="",
                 error="No active focus to complete. Use start_focus first.",
             )
 
