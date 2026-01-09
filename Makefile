@@ -57,3 +57,33 @@ bench-swe-lite: ## Run a suite of 10 SWE-bench Lite instances using Haiku (Expen
 
 analysis: ## Analyze active/recent benchmark logs
 	$(PYTHON) scripts/analyze_progress.py
+
+# --- Proper SWE-bench with Docker Evaluation ---
+
+bench-proper: ## Run SWE-bench with official Docker evaluation (Sonnet, N=5)
+	@echo "Running proper SWE-bench benchmark with Docker evaluation..."
+	@echo "This uses the official SWE-bench harness for accurate results."
+	$(PYTHON) scripts/run_swebench_proper.py \
+		--model claude-sonnet-4-5-20250929 \
+		--limit 5 \
+		--max-workers 3
+
+bench-proper-n10: ## Run SWE-bench N=10 with Docker evaluation (Sonnet)
+	@echo "Running N=10 SWE-bench with Docker evaluation..."
+	$(PYTHON) scripts/run_swebench_proper.py \
+		--model claude-sonnet-4-5-20250929 \
+		--limit 10 \
+		--max-workers 4
+
+bench-eval-only: ## Run Docker evaluation on existing predictions
+	@echo "Running evaluation on existing predictions..."
+	@echo "Usage: make bench-eval-only PRED=results/predictions_baseline_xxx.json"
+	$(PYTHON) -m swebench.harness.run_evaluation \
+		--predictions_path $(PRED) \
+		--run_id eval_$(shell date +%Y%m%d_%H%M%S) \
+		--max_workers 4 \
+		--dataset_name "princeton-nlp/SWE-bench_Lite"
+
+check-docker: ## Check Docker is configured correctly
+	@echo "Checking Docker configuration..."
+	@$(PYTHON) -c "from scripts.run_swebench_proper import verify_docker; verify_docker()"
