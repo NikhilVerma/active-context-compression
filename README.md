@@ -1,70 +1,81 @@
-# Focus: Active Context Compression for LLM Agents
+# Focus: Active Context Compression for "Immortal" Agents
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![License](https://img.shields.io/badge/license-MIT-blue)
+![Python](https://img.shields.io/badge/python-3.10%2B-green)
 
-**Focus** is an experimental architecture for LLM agents that enables "Active Context Compression." Instead of passively accumulating context until failure, the agent actively explores, summarizes key learnings, and deletes unproductive history—mimicking the biological efficiency of *Physarum polycephalum* (slime mold).
+**Focus** is an agentic architecture that solves the "Context Bloat" problem by actively pruning its own history while preserving key learnings. Inspired by *Physarum polycephalum*, it allows LLM agents to run indefinitely on complex tasks without exceeding context windows or losing crucial information.
 
-## The Problem
-Standard agents use an "Append-Only" context strategy. This leads to:
-1.  **Exponential Cost:** Re-reading the entire history for every step.
-2.  **Context Poisoning:** Getting confused by previous failed attempts.
-3.  **Hard Limits:** Crashing when the context window is full.
+## 📄 Paper
+See `paper/paper.pdf` (build from `paper.tex`) for the full technical details.
 
-## The Solution: Focus Agent
-The Focus Agent introduces a "Sawtooth" context pattern:
-1.  **Explore:** Run tools and investigate.
-2.  **Consolidate:** Stop, summarize findings into a "Knowledge" block.
-3.  **Withdraw:** Delete the raw logs of the exploration path.
+## 🚀 Key Features
 
-## Results (SWE-bench Lite)
-Evaluated on 10 diverse software engineering tasks using `claude-haiku-4-5-20251001`:
+*   **Active Context Compression:** Agents decide when to "complete a focus", compressing recent messages into a persistent "Knowledge" block.
+*   **Biological Inspiration:** Mimics the "exploration vs. consolidation" phases of slime molds.
+*   **SWE-bench Verified:** Evaluated on the SWE-bench Lite benchmark using the official Docker-based harness.
 
-| Metric | Baseline | Focus (Ours) | Delta |
-| :--- | :--- | :--- | :--- |
-| **Avg Tokens** | 2,871,599 | 1,229,816 | **-57.2%** |
-| **Avg Wall Time** | 286.7s | 180.3s | **-37.1%** |
-| **Final Context** | 97 messages | 16.5 messages | **-83.0%** |
+## 🛠️ Installation
 
-In a targeted test with `claude-sonnet-4-5`, the Focus Agent **successfully solved** the `pallets/flask-5063` task while using **66% fewer tokens** than the baseline.
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/NikhilVerma/active-context-compression.git
+    cd active-context-compression
+    ```
 
-## Quick Start
+2.  **Install dependencies (using uv):**
+    ```bash
+    uv sync
+    # Or manually: pip install -r requirements.txt
+    ```
 
-### Prerequisites
-- Python 3.10+
-- `uv` (recommended) or `pip`
-- `ANTHROPIC_API_KEY`
+3.  **Set up environment:**
+    Create a `.env` file with your API keys:
+    ```bash
+    ANTHROPIC_API_KEY=sk-ant-...
+    OPENAI_API_KEY=sk-... (optional)
+    ```
 
-### Installation
+4.  **Docker Requirement:**
+    You must have Docker installed and running (Docker Desktop or OrbStack) for the evaluation harness.
+
+## 🏃‍♂️ Running Benchmarks
+
+We use a single canonical script for all benchmarks. It runs the agents to generate patches and then evaluates them using the official SWE-bench Docker container.
+
+### 1. Run the "Easy" Sanity Check (N=5)
 ```bash
-git clone https://github.com/yourusername/focus-agent.git
-cd focus-agent
-uv sync
+uv run python scripts/run_swebench.py --limit 5 --model claude-3-5-sonnet-20241022
 ```
 
-### Running the Benchmark
-To replicate our results on SWE-bench Lite:
+### 2. Run with Different Compression Strategies (Ablation)
+Control the compression behavior with `--steps-per-focus`:
 
+*   **Fixed Frequency (Every 15 steps - Default):**
+    ```bash
+    uv run python scripts/run_swebench.py --steps-per-focus 15
+    ```
+*   **Relaxed Frequency (Every 30 steps):**
+    ```bash
+    uv run python scripts/run_swebench.py --steps-per-focus 30
+    ```
+*   **Model-Triggered (Autonomous):**
+    ```bash
+    uv run python scripts/run_swebench.py --steps-per-focus 0
+    ```
+
+### 3. Run Full Benchmark (Expensive!)
 ```bash
-# Run a specific instance (e.g., Flask)
-uv run scripts/run_swebench.py --instance-ids pallets__flask-5063 --model claude-sonnet-4-5-20250929
-
-# Run the full N=10 suite (Warning: expensive!)
-uv run scripts/run_swebench.py --limit 10 --model claude-haiku-4-5-20251001
+uv run python scripts/run_swebench.py --limit 100 --model claude-3-5-sonnet-20241022
 ```
 
-## Paper & Artifacts
-*   📄 **[Read the Paper](paper.pdf)** (Compile `paper.tex` to generate)
-*   📊 **[View Raw Logs](logs/raw/)**
-*   📈 **[View Metrics](results/metrics/)**
+## 📊 Results
 
-## Citation
-If you use this work, please cite:
+Results are saved in `results/`.
+*   `predictions_*.json`: The raw patches generated by the agents.
+*   `logs/run_evaluation/`: The detailed pass/fail reports from the Docker evaluation.
 
-```bibtex
-@misc{focus2026,
-  title={Active Context Compression: Enabling "Immortal" Agents},
-  author={Verma, Nikhil},
-  year={2026},
-  publisher={GitHub}
-}
-```
+## 🤝 Contributing
+Open an issue or PR to discuss improvements.
+
+## 📜 License
+MIT
