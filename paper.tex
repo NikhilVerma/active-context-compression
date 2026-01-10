@@ -16,7 +16,7 @@
 
 \begin{document}
 
-\title{Active Context Compression: Enabling ``Immortal'' Agents via Episodic Memory Consolidation}
+\title{Active Context Compression: Autonomous Memory Management in LLM Agents}
 
 \author{\IEEEauthorblockN{Nikhil Verma}
 \IEEEauthorblockA{\textit{Independent Researcher} \\
@@ -161,10 +161,10 @@ On \texttt{mwaskom\_\_seaborn-2848}, Baseline crashed after 209K tokens (exceedi
 
 
 \section{Discussion}
-\subsection{The Cost of Immortality}
+\subsection{The Cognitive Tax of Compression}
 Active compression introduces a ``cognitive tax''---the tokens spent generating summaries. We measured this tax: in our experiments, Focus agents generated on average 11,556 output tokens (for Haiku) compared to 18,158 for baseline agents. The \textit{additional} tokens for summary generation are offset many times over by the input token savings from not re-processing history.
 
-For short, trivial tasks, this tax may outweigh the benefits. However, for long-horizon exploration (40+ steps), the tax becomes negligible compared to the cost of carrying a massive history. It effectively amortizes the cost of ``memory'' over the lifetime of the agent.
+For short, trivial tasks, this tax may outweigh the benefits. However, for long-horizon exploration (40+ steps), the tax becomes negligible compared to the cost of carrying a massive history. It effectively amortizes the cost of ``memory'' over the agent's lifetime. Yet this comes with a fundamental trade-off: compression that prevents context overflow can also discard information needed for correct solutions.
 
 \subsection{Limitations}
 Several limitations warrant discussion:
