@@ -22,7 +22,7 @@ from src.tools.focus import (
     parse_focus_start,
 )
 
-from .base import Message, MessageRole, TaskResult
+from .base import Message, MessageRole, StepSnapshot, TaskResult
 from .baseline import BaselineAgent
 
 
@@ -65,6 +65,7 @@ class FocusAgent(BaselineAgent):
         self._focus_stack: list[FocusState] = []
         self._knowledge: list[KnowledgeEntry] = []
         self._console = console or Console()
+        self._run_start_time: float = 0.0  # For trajectory tracking
 
     def reset(self) -> None:
         """Reset agent state."""
@@ -129,6 +130,7 @@ class FocusAgent(BaselineAgent):
 
         self.reset()
         start_time = time.time()
+        self._run_start_time = start_time  # Store for compression tracking
 
         # System prompt with focus tool guidance
         system_prompt = f"""You are an expert software engineer. Your task is to solve the following problem.
@@ -164,6 +166,17 @@ When you're done with the entire task, respond with TASK_COMPLETE and a summary 
             # Call LLM
             response = await self._call_llm(self.messages)
             self._add_message(response)
+
+            # Track trajectory snapshot after LLM call
+            self.metrics.trajectory.append(
+                StepSnapshot(
+                    step=step,
+                    message_count=len(self.messages),
+                    total_tokens=self.metrics.total_input_tokens + self.metrics.total_output_tokens,
+                    compressions_so_far=self.metrics.compressions,
+                    timestamp=time.time() - start_time,
+                )
+            )
 
             # Check if done
             if "TASK_COMPLETE" in response.content:
@@ -307,9 +320,7 @@ When you're done with the entire task, respond with TASK_COMPLETE and a summary 
             self.messages = self.messages[:safe_point]
 
             # Log the compression
-            self._console.print(
-                f"[dim cyan]↩  Focus completed: {focus.description}[/dim cyan]"
-            )
+            self._console.print(f"[dim cyan]↩  Focus completed: {focus.description}[/dim cyan]")
             self._console.print(
                 f"[dim]   Dropped {messages_to_drop} messages | "
                 f"Preserved {len(self._knowledge)} knowledge entries | "
@@ -318,6 +329,20 @@ When you're done with the entire task, respond with TASK_COMPLETE and a summary 
 
         # Rebuild with updated knowledge
         self._rebuild_messages_with_knowledge()
+
+        # Track post-compression snapshot (shows the sawtooth drop)
+        import time
+
+        if hasattr(self, "_run_start_time"):
+            self.metrics.trajectory.append(
+                StepSnapshot(
+                    step=self.metrics.llm_calls,  # Use LLM calls as step counter
+                    message_count=len(self.messages),
+                    total_tokens=self.metrics.total_input_tokens + self.metrics.total_output_tokens,
+                    compressions_so_far=self.metrics.compressions,
+                    timestamp=time.time() - self._run_start_time,
+                )
+            )
 
         # Add continuation message
         next_action = focus_data.get("next_action", "")
@@ -381,8 +406,6 @@ Your learnings have been saved to the KNOWLEDGE section above.
 
         # Fallback to minimum
         return min_safe
-
-
 
     async def _extract_learnings_from_messages(self) -> str:
         # This method is no longer used in the new flow but kept for compatibility

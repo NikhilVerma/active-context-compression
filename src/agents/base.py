@@ -30,6 +30,17 @@ class Message:
 
 
 @dataclass
+class StepSnapshot:
+    """Snapshot of agent state at a specific step."""
+
+    step: int
+    message_count: int
+    total_tokens: int
+    compressions_so_far: int
+    timestamp: float
+
+
+@dataclass
 class AgentMetrics:
     """Metrics collected during agent execution."""
 
@@ -40,6 +51,7 @@ class AgentMetrics:
     compressions: int = 0
     messages_dropped: int = 0
     wall_time_seconds: float = 0.0
+    trajectory: list[StepSnapshot] = field(default_factory=list)
 
 
 class TaskResult(BaseModel):

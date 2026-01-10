@@ -69,7 +69,7 @@ class BenchmarkResults:
 
             # success is now a float (0.0 to 1.0)
             avg_success = sum(r.success for r in runs) / len(runs)
-            
+
             return {
                 "count": len(runs),
                 "success_rate": avg_success,
@@ -87,9 +87,7 @@ class BenchmarkResults:
 
         # Add focus-specific metrics
         if focus:
-            focus_summary["avg_compressions"] = sum(r.compressions for r in focus) / len(
-                focus
-            )
+            focus_summary["avg_compressions"] = sum(r.compressions for r in focus) / len(focus)
             focus_summary["avg_messages_dropped"] = sum(r.messages_dropped for r in focus) / len(
                 focus
             )
@@ -105,7 +103,9 @@ class BenchmarkResults:
                     baseline_val = baseline_summary[key]
                     focus_val = focus_summary[key]
                     if baseline_val != 0:
-                        deltas[f"{key}_delta_pct"] = ((focus_val - baseline_val) / baseline_val) * 100
+                        deltas[f"{key}_delta_pct"] = (
+                            (focus_val - baseline_val) / baseline_val
+                        ) * 100
 
         return {
             "baseline": baseline_summary,
@@ -160,7 +160,7 @@ class MetricsTracker:
         """Record a single run."""
         # Convert bool to float (0.0 or 1.0)
         success_val = float(success) if isinstance(success, bool) else success
-        
+
         run = RunMetrics(
             problem_id=problem_id,
             agent_type=agent_type,
@@ -175,7 +175,6 @@ class MetricsTracker:
             tool_calls=metrics.get("tool_calls", 0),
             wall_time_seconds=metrics.get("wall_time_seconds", 0.0),
             message_count=metrics.get("message_count", 0),
-            
             # Focus metrics
             compressions=metrics.get("compressions", 0),
             messages_dropped=metrics.get("messages_dropped", 0),

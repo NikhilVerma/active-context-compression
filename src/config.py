@@ -7,13 +7,13 @@ from pathlib import Path
 def get_docker_socket() -> str | None:
     """
     Find and return the Docker socket path.
-    
+
     Supports:
     - Standard Linux: /var/run/docker.sock
     - OrbStack (macOS): ~/.orbstack/run/docker.sock
     - Docker Desktop (macOS): ~/.docker/run/docker.sock
     - Custom: DOCKER_HOST environment variable
-    
+
     Returns:
         Socket path if found, None otherwise.
     """
@@ -23,26 +23,26 @@ def get_docker_socket() -> str | None:
         if host.startswith("unix://"):
             return host[7:]  # Strip unix:// prefix
         return host
-    
+
     # Check common socket locations
     socket_paths = [
         "/var/run/docker.sock",
         os.path.expanduser("~/.orbstack/run/docker.sock"),  # OrbStack
-        os.path.expanduser("~/.docker/run/docker.sock"),    # Docker Desktop
+        os.path.expanduser("~/.docker/run/docker.sock"),  # Docker Desktop
         "/run/docker.sock",
     ]
-    
+
     for socket_path in socket_paths:
         if os.path.exists(socket_path):
             return socket_path
-    
+
     return None
 
 
 def setup_docker_env() -> bool:
     """
     Configure Docker environment variables.
-    
+
     Returns:
         True if Docker is configured, False otherwise.
     """

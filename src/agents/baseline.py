@@ -10,7 +10,7 @@ import openai
 
 from src.tools import Tool
 
-from .base import Agent, Message, MessageRole, TaskResult
+from .base import Agent, Message, MessageRole, StepSnapshot, TaskResult
 
 
 class BaselineAgent(Agent):
@@ -59,6 +59,17 @@ When you're done, respond with TASK_COMPLETE and a summary of what you did."""
             # Call LLM
             response = await self._call_llm(self.messages)
             self._add_message(response)
+
+            # Track trajectory snapshot after LLM call
+            self.metrics.trajectory.append(
+                StepSnapshot(
+                    step=step,
+                    message_count=len(self.messages),
+                    total_tokens=self.metrics.total_input_tokens + self.metrics.total_output_tokens,
+                    compressions_so_far=self.metrics.compressions,
+                    timestamp=time.time() - start_time,
+                )
+            )
 
             # Check if done
             if "TASK_COMPLETE" in response.content:
@@ -263,4 +274,14 @@ When you're done, respond with TASK_COMPLETE and a summary of what you did."""
             "messages_dropped": self.metrics.messages_dropped,
             "wall_time_seconds": self.metrics.wall_time_seconds,
             "message_count": len(self.messages),
+            "trajectory": [
+                {
+                    "step": s.step,
+                    "message_count": s.message_count,
+                    "total_tokens": s.total_tokens,
+                    "compressions_so_far": s.compressions_so_far,
+                    "timestamp": s.timestamp,
+                }
+                for s in self.metrics.trajectory
+            ],
         }

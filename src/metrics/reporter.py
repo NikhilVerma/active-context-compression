@@ -129,9 +129,7 @@ def print_comparison_report(results: BenchmarkResults) -> None:
             r for r in results.runs if r.problem_id == problem_id and r.agent_type == "baseline"
         ]
         focus_runs = [
-            r
-            for r in results.runs
-            if r.problem_id == problem_id and r.agent_type == "focus"
+            r for r in results.runs if r.problem_id == problem_id and r.agent_type == "focus"
         ]
 
         baseline_status = (

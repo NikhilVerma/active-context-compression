@@ -1,0 +1,3708 @@
+[
+  {
+    "instance_id": "mwaskom__seaborn-2848",
+    "agent_type": "baseline",
+    "model": "claude-haiku-4-5-20251001",
+    "success": false,
+    "patch": "",
+    "metrics": {},
+    "error": "Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'prompt is too long: 209254 tokens > 200000 maximum'}, 'request_id': 'req_011CWyHq14muZLsEYKKBi3F5'}"
+  },
+  {
+    "instance_id": "mwaskom__seaborn-2848",
+    "agent_type": "focus",
+    "model": "claude-haiku-4-5-20251001",
+    "success": true,
+    "patch": "diff --git a/seaborn/_core/plot.py b/seaborn/_core/plot.py\nindex 2469df00..90f4b78c 100644\n--- a/seaborn/_core/plot.py\n+++ b/seaborn/_core/plot.py\n@@ -1162,7 +1162,7 @@ class Plotter:\n         for view in subplots:\n             view_df = self._filter_subplot_data(df, view)\n             axes_df = view_df[coord_cols]\n-            with pd.option_context(\"mode.use_inf_as_null\", True):\n+            with pd.option_context(\"mode.use_inf_as_na\", True):\n                 axes_df = axes_df.dropna()\n             for var, values in axes_df.items():\n                 scale = view[f\"{var[0]}scale\"]\n@@ -1288,7 +1288,7 @@ class Plotter:\n \n                 axes_df = self._filter_subplot_data(df, view)\n \n-                with pd.option_context(\"mode.use_inf_as_null\", True):\n+                with pd.option_context(\"mode.use_inf_as_na\", True):\n                     if keep_na:\n                         # The simpler thing to do would be x.dropna().reindex(x.index).\n                         # But that doesn't work with the way that the subset iteration\ndiff --git a/seaborn/_oldcore.py b/seaborn/_oldcore.py\nindex c9218c1f..fd57efdf 100644\n--- a/seaborn/_oldcore.py\n+++ b/seaborn/_oldcore.py\n@@ -1093,7 +1093,7 @@ class VectorPlotter:\n                 parts = []\n                 grouped = self.plot_data[var].groupby(self.converters[var], sort=False)\n                 for converter, orig in grouped:\n-                    with pd.option_context('mode.use_inf_as_null', True):\n+                    with pd.option_context('mode.use_inf_as_na', True):\n                         orig = orig.dropna()\n                         if var in self.var_levels:\n                             # TODO this should happen in some centralized location\ndiff --git a/seaborn/axisgrid.py b/seaborn/axisgrid.py\nindex 8526f44b..6bee2f2a 100644\n--- a/seaborn/axisgrid.py\n+++ b/seaborn/axisgrid.py\n@@ -1558,6 +1558,12 @@ class PairGrid(Grid):\n         if self._dropna:\n             data = data.dropna()\n \n+        # Filter data to only include hue values that are in hue_order\n+        if self._hue_var is not None and self._hue_order is not None:\n+            # Create a mask for rows where hue value is in hue_order\n+            hue_mask = data[self._hue_var].isin(self._hue_order)\n+            data = data[hue_mask]\n+\n         x = data[x_var]\n         y = data[y_var]\n         if self._hue_var is None:\ndiff --git a/seaborn/categorical.py b/seaborn/categorical.py\nindex 7df91b05..01087311 100644\n--- a/seaborn/categorical.py\n+++ b/seaborn/categorical.py\n@@ -1842,7 +1842,7 @@ class _LVPlotter(_CategoricalPlotter):\n         vals = np.asarray(vals)\n         # Remove infinite values while handling a 'object' dtype\n         # that can come from pd.Float64Dtype() input\n-        with pd.option_context('mode.use_inf_as_null', True):\n+        with pd.option_context('mode.use_inf_as_na', True):\n             vals = vals[~pd.isnull(vals)]\n         n = len(vals)\n         p = self.outlier_prop\ndiff --git a/seaborn/cm.py b/seaborn/cm.py\nindex 4e39fe7a..a57e9731 100644\n--- a/seaborn/cm.py\n+++ b/seaborn/cm.py\n@@ -1571,6 +1571,8 @@ _lut_dict = dict(\n \n )\n \n+from matplotlib import colormaps\n+\n for _name, _lut in _lut_dict.items():\n \n     _cmap = colors.ListedColormap(_lut, _name) \n@@ -1579,7 +1581,7 @@ for _name, _lut in _lut_dict.items():\n     _cmap_r = colors.ListedColormap(_lut[::-1], _name + \"_r\")  \n     locals()[_name + \"_r\"] = _cmap_r\n \n-    mpl_cm.register_cmap(_name, _cmap)\n-    mpl_cm.register_cmap(_name + \"_r\", _cmap_r)\n+    colormaps.register(_cmap)\n+    colormaps.register(_cmap_r)\n \n del colors, mpl_cm\n\\ No newline at end of file\n",
+    "metrics": {
+      "total_input_tokens": 6203706,
+      "total_output_tokens": 17528,
+      "llm_calls": 66,
+      "tool_calls": 65,
+      "compressions": 2,
+      "messages_dropped": 83,
+      "wall_time_seconds": 304.21905612945557,
+      "message_count": 50,
+      "trajectory": [
+        {
+          "step": 0,
+          "message_count": 3,
+          "total_tokens": 2750,
+          "compressions_so_far": 0,
+          "timestamp": 2.0759382247924805
+        },
+        {
+          "step": 1,
+          "message_count": 5,
+          "total_tokens": 6862,
+          "compressions_so_far": 0,
+          "timestamp": 3.1100051403045654
+        },
+        {
+          "step": 2,
+          "message_count": 7,
+          "total_tokens": 11137,
+          "compressions_so_far": 0,
+          "timestamp": 4.013087034225464
+        },
+        {
+          "step": 3,
+          "message_count": 9,
+          "total_tokens": 15691,
+          "compressions_so_far": 0,
+          "timestamp": 6.3831963539123535
+        },
+        {
+          "step": 4,
+          "message_count": 11,
+          "total_tokens": 20391,
+          "compressions_so_far": 0,
+          "timestamp": 8.12511920928955
+        },
+        {
+          "step": 5,
+          "message_count": 13,
+          "total_tokens": 25184,
+          "compressions_so_far": 0,
+          "timestamp": 10.586097240447998
+        },
+        {
+          "step": 6,
+          "message_count": 15,
+          "total_tokens": 54650,
+          "compressions_so_far": 0,
+          "timestamp": 13.277542352676392
+        },
+        {
+          "step": 7,
+          "message_count": 17,
+          "total_tokens": 84352,
+          "compressions_so_far": 0,
+          "timestamp": 15.907414197921753
+        },
+        {
+          "step": 8,
+          "message_count": 19,
+          "total_tokens": 114198,
+          "compressions_so_far": 0,
+          "timestamp": 17.959554195404053
+        },
+        {
+          "step": 9,
+          "message_count": 21,
+          "total_tokens": 144601,
+          "compressions_so_far": 0,
+          "timestamp": 28.877077102661133
+        },
+        {
+          "step": 10,
+          "message_count": 23,
+          "total_tokens": 175114,
+          "compressions_so_far": 0,
+          "timestamp": 30.55717134475708
+        },
+        {
+          "step": 11,
+          "message_count": 25,
+          "total_tokens": 242675,
+          "compressions_so_far": 0,
+          "timestamp": 34.494325160980225
+        },
+        {
+          "step": 12,
+          "message_count": 27,
+          "total_tokens": 310563,
+          "compressions_so_far": 0,
+          "timestamp": 37.48100209236145
+        },
+        {
+          "step": 13,
+          "message_count": 29,
+          "total_tokens": 415499,
+          "compressions_so_far": 0,
+          "timestamp": 42.16791129112244
+        },
+        {
+          "step": 14,
+          "message_count": 31,
+          "total_tokens": 520598,
+          "compressions_so_far": 0,
+          "timestamp": 44.859392166137695
+        },
+        {
+          "step": 15,
+          "message_count": 33,
+          "total_tokens": 626168,
+          "compressions_so_far": 0,
+          "timestamp": 50.549164056777954
+        },
+        {
+          "step": 16,
+          "message_count": 35,
+          "total_tokens": 732105,
+          "compressions_so_far": 0,
+          "timestamp": 54.2746741771698
+        },
+        {
+          "step": 17,
+          "message_count": 37,
+          "total_tokens": 838476,
+          "compressions_so_far": 0,
+          "timestamp": 57.617276191711426
+        },
+        {
+          "step": 18,
+          "message_count": 39,
+          "total_tokens": 945813,
+          "compressions_so_far": 0,
+          "timestamp": 61.81514620780945
+        },
+        {
+          "step": 19,
+          "message_count": 41,
+          "total_tokens": 1053303,
+          "compressions_so_far": 0,
+          "timestamp": 64.65147709846497
+        },
+        {
+          "step": 20,
+          "message_count": 43,
+          "total_tokens": 1160943,
+          "compressions_so_far": 0,
+          "timestamp": 67.71977519989014
+        },
+        {
+          "step": 21,
+          "message_count": 45,
+          "total_tokens": 1270019,
+          "compressions_so_far": 0,
+          "timestamp": 73.07209324836731
+        },
+        {
+          "step": 22,
+          "message_count": 47,
+          "total_tokens": 1379243,
+          "compressions_so_far": 0,
+          "timestamp": 75.61738419532776
+        },
+        {
+          "step": 23,
+          "message_count": 49,
+          "total_tokens": 1489740,
+          "compressions_so_far": 0,
+          "timestamp": 78.97042322158813
+        },
+        {
+          "step": 24,
+          "message_count": 51,
+          "total_tokens": 1600451,
+          "compressions_so_far": 0,
+          "timestamp": 81.64833116531372
+        },
+        {
+          "step": 25,
+          "message_count": 53,
+          "total_tokens": 1711281,
+          "compressions_so_far": 0,
+          "timestamp": 84.87886428833008
+        },
+        {
+          "step": 26,
+          "message_count": 55,
+          "total_tokens": 1822218,
+          "compressions_so_far": 0,
+          "timestamp": 87.94133520126343
+        },
+        {
+          "step": 27,
+          "message_count": 57,
+          "total_tokens": 1933402,
+          "compressions_so_far": 0,
+          "timestamp": 93.11699199676514
+        },
+        {
+          "step": 28,
+          "message_count": 59,
+          "total_tokens": 2044745,
+          "compressions_so_far": 0,
+          "timestamp": 95.88259530067444
+        },
+        {
+          "step": 29,
+          "message_count": 61,
+          "total_tokens": 2160003,
+          "compressions_so_far": 0,
+          "timestamp": 100.15016508102417
+        },
+        {
+          "step": 30,
+          "message_count": 63,
+          "total_tokens": 2275383,
+          "compressions_so_far": 0,
+          "timestamp": 102.53299832344055
+        },
+        {
+          "step": 31,
+          "message_count": 65,
+          "total_tokens": 2407201,
+          "compressions_so_far": 0,
+          "timestamp": 107.43808627128601
+        },
+        {
+          "step": 32,
+          "message_count": 67,
+          "total_tokens": 2563743,
+          "compressions_so_far": 0,
+          "timestamp": 112.01523208618164
+        },
+        {
+          "step": 33,
+          "message_count": 69,
+          "total_tokens": 2745152,
+          "compressions_so_far": 0,
+          "timestamp": 118.78706407546997
+        },
+        {
+          "step": 34,
+          "message_count": 62,
+          "total_tokens": 2745152,
+          "compressions_so_far": 1,
+          "timestamp": 118.78843116760254
+        },
+        {
+          "step": 34,
+          "message_count": 64,
+          "total_tokens": 2860811,
+          "compressions_so_far": 1,
+          "timestamp": 121.40213322639465
+        },
+        {
+          "step": 35,
+          "message_count": 66,
+          "total_tokens": 3001238,
+          "compressions_so_far": 1,
+          "timestamp": 126.39878606796265
+        },
+        {
+          "step": 36,
+          "message_count": 68,
+          "total_tokens": 3166676,
+          "compressions_so_far": 1,
+          "timestamp": 133.8736891746521
+        },
+        {
+          "step": 37,
+          "message_count": 70,
+          "total_tokens": 3332451,
+          "compressions_so_far": 1,
+          "timestamp": 138.2788951396942
+        },
+        {
+          "step": 38,
+          "message_count": 72,
+          "total_tokens": 3500060,
+          "compressions_so_far": 1,
+          "timestamp": 148.00520515441895
+        },
+        {
+          "step": 39,
+          "message_count": 74,
+          "total_tokens": 3667835,
+          "compressions_so_far": 1,
+          "timestamp": 152.3261570930481
+        },
+        {
+          "step": 40,
+          "message_count": 76,
+          "total_tokens": 3835798,
+          "compressions_so_far": 1,
+          "timestamp": 159.59106016159058
+        },
+        {
+          "step": 41,
+          "message_count": 78,
+          "total_tokens": 4006148,
+          "compressions_so_far": 1,
+          "timestamp": 168.9132170677185
+        },
+        {
+          "step": 42,
+          "message_count": 80,
+          "total_tokens": 4176664,
+          "compressions_so_far": 1,
+          "timestamp": 174.21936225891113
+        },
+        {
+          "step": 43,
+          "message_count": 82,
+          "total_tokens": 4347914,
+          "compressions_so_far": 1,
+          "timestamp": 183.12993621826172
+        },
+        {
+          "step": 44,
+          "message_count": 84,
+          "total_tokens": 4519333,
+          "compressions_so_far": 1,
+          "timestamp": 187.53328824043274
+        },
+        {
+          "step": 45,
+          "message_count": 86,
+          "total_tokens": 4691176,
+          "compressions_so_far": 1,
+          "timestamp": 196.3390862941742
+        },
+        {
+          "step": 46,
+          "message_count": 10,
+          "total_tokens": 4691176,
+          "compressions_so_far": 2,
+          "timestamp": 196.34108519554138
+        },
+        {
+          "step": 46,
+          "message_count": 12,
+          "total_tokens": 4696395,
+          "compressions_so_far": 2,
+          "timestamp": 197.87422919273376
+        },
+        {
+          "step": 47,
+          "message_count": 14,
+          "total_tokens": 4726363,
+          "compressions_so_far": 2,
+          "timestamp": 200.26459336280823
+        },
+        {
+          "step": 48,
+          "message_count": 16,
+          "total_tokens": 4781114,
+          "compressions_so_far": 2,
+          "timestamp": 203.09552311897278
+        },
+        {
+          "step": 49,
+          "message_count": 18,
+          "total_tokens": 4836184,
+          "compressions_so_far": 2,
+          "timestamp": 207.26213717460632
+        },
+        {
+          "step": 50,
+          "message_count": 20,
+          "total_tokens": 4893704,
+          "compressions_so_far": 2,
+          "timestamp": 210.57084131240845
+        },
+        {
+          "step": 51,
+          "message_count": 22,
+          "total_tokens": 4953046,
+          "compressions_so_far": 2,
+          "timestamp": 215.49196314811707
+        },
+        {
+          "step": 52,
+          "message_count": 24,
+          "total_tokens": 5013697,
+          "compressions_so_far": 2,
+          "timestamp": 218.55847811698914
+        },
+        {
+          "step": 53,
+          "message_count": 26,
+          "total_tokens": 5075002,
+          "compressions_so_far": 2,
+          "timestamp": 221.3602523803711
+        },
+        {
+          "step": 54,
+          "message_count": 28,
+          "total_tokens": 5159407,
+          "compressions_so_far": 2,
+          "timestamp": 225.77167224884033
+        },
+        {
+          "step": 55,
+          "message_count": 30,
+          "total_tokens": 5245159,
+          "compressions_so_far": 2,
+          "timestamp": 233.33934211730957
+        },
+        {
+          "step": 56,
+          "message_count": 32,
+          "total_tokens": 5331492,
+          "compressions_so_far": 2,
+          "timestamp": 239.14816522598267
+        },
+        {
+          "step": 57,
+          "message_count": 34,
+          "total_tokens": 5418790,
+          "compressions_so_far": 2,
+          "timestamp": 245.73059821128845
+        },
+        {
+          "step": 58,
+          "message_count": 36,
+          "total_tokens": 5506713,
+          "compressions_so_far": 2,
+          "timestamp": 251.32719898223877
+        },
+        {
+          "step": 59,
+          "message_count": 38,
+          "total_tokens": 5595514,
+          "compressions_so_far": 2,
+          "timestamp": 259.6635420322418
+        },
+        {
+          "step": 60,
+          "message_count": 40,
+          "total_tokens": 5685411,
+          "compressions_so_far": 2,
+          "timestamp": 267.6106901168823
+        },
+        {
+          "step": 61,
+          "message_count": 42,
+          "total_tokens": 5776510,
+          "compressions_so_far": 2,
+          "timestamp": 276.6188280582428
+        },
+        {
+          "step": 62,
+          "message_count": 44,
+          "total_tokens": 5867926,
+          "compressions_so_far": 2,
+          "timestamp": 281.1259672641754
+        },
+        {
+          "step": 63,
+          "message_count": 46,
+          "total_tokens": 5984834,
+          "compressions_so_far": 2,
+          "timestamp": 289.1149640083313
+        },
+        {
+          "step": 64,
+          "message_count": 48,
+          "total_tokens": 6102696,
+          "compressions_so_far": 2,
+          "timestamp": 294.7258450984955
+        },
+        {
+          "step": 65,
+          "message_count": 50,
+          "total_tokens": 6221234,
+          "compressions_so_far": 2,
+          "timestamp": 304.21902322769165
+        }
+      ],
+      "knowledge_entries": 2,
+      "active_focuses": 0
+    },
+    "error": null
+  },
+  {
+    "instance_id": "pallets__flask-4045",
+    "agent_type": "baseline",
+    "model": "claude-haiku-4-5-20251001",
+    "success": true,
+    "patch": "diff --git a/src/flask/blueprints.py b/src/flask/blueprints.py\nindex 5fb84d86..823995f6 100644\n--- a/src/flask/blueprints.py\n+++ b/src/flask/blueprints.py\n@@ -188,6 +188,10 @@ class Blueprint(Scaffold):\n             template_folder=template_folder,\n             root_path=root_path,\n         )\n+\n+        if \".\" in name:\n+            raise ValueError(\"'name' may not contain a dot '.' character.\")\n+\n         self.name = name\n         self.url_prefix = url_prefix\n         self.subdomain = subdomain\n@@ -360,12 +364,12 @@ class Blueprint(Scaffold):\n         \"\"\"Like :meth:`Flask.add_url_rule` but for a blueprint.  The endpoint for\n         the :func:`url_for` function is prefixed with the name of the blueprint.\n         \"\"\"\n-        if endpoint:\n-            assert \".\" not in endpoint, \"Blueprint endpoints should not contain dots\"\n-        if view_func and hasattr(view_func, \"__name__\"):\n-            assert (\n-                \".\" not in view_func.__name__\n-            ), \"Blueprint view function name should not contain dots\"\n+        if endpoint and \".\" in endpoint:\n+            raise ValueError(\"'endpoint' may not contain a dot '.' character.\")\n+\n+        if view_func and hasattr(view_func, \"__name__\") and \".\" in view_func.__name__:\n+            raise ValueError(\"'view_func' name may not contain a dot '.' character.\")\n+\n         self.record(lambda s: s.add_url_rule(rule, endpoint, view_func, **options))\n \n     def app_template_filter(self, name: t.Optional[str] = None) -> t.Callable:\ndiff --git a/tests/test_basic.py b/tests/test_basic.py\nindex d6ec3fe4..7bdeba1e 100644\n--- a/tests/test_basic.py\n+++ b/tests/test_basic.py\n@@ -1631,7 +1631,7 @@ def test_url_processors(app, client):\n \n \n def test_inject_blueprint_url_defaults(app):\n-    bp = flask.Blueprint(\"foo.bar.baz\", __name__, template_folder=\"template\")\n+    bp = flask.Blueprint(\"foo\", __name__, template_folder=\"template\")\n \n     @bp.url_defaults\n     def bp_defaults(endpoint, values):\n@@ -1644,12 +1644,12 @@ def test_inject_blueprint_url_defaults(app):\n     app.register_blueprint(bp)\n \n     values = dict()\n-    app.inject_url_defaults(\"foo.bar.baz.view\", values)\n+    app.inject_url_defaults(\"foo.view\", values)\n     expected = dict(page=\"login\")\n     assert values == expected\n \n     with app.test_request_context(\"/somepage\"):\n-        url = flask.url_for(\"foo.bar.baz.view\")\n+        url = flask.url_for(\"foo.view\")\n     expected = \"/login\"\n     assert url == expected\n \ndiff --git a/tests/test_blueprints.py b/tests/test_blueprints.py\nindex b986ca02..cfcb43b3 100644\n--- a/tests/test_blueprints.py\n+++ b/tests/test_blueprints.py\n@@ -1,5 +1,3 @@\n-import functools\n-\n import pytest\n from jinja2 import TemplateNotFound\n from werkzeug.http import parse_cache_control_header\n@@ -253,28 +251,9 @@ def test_templates_list(test_apps):\n     assert templates == [\"admin/index.html\", \"frontend/index.html\"]\n \n \n-def test_dotted_names(app, client):\n-    frontend = flask.Blueprint(\"myapp.frontend\", __name__)\n-    backend = flask.Blueprint(\"myapp.backend\", __name__)\n-\n-    @frontend.route(\"/fe\")\n-    def frontend_index():\n-        return flask.url_for(\"myapp.backend.backend_index\")\n-\n-    @frontend.route(\"/fe2\")\n-    def frontend_page2():\n-        return flask.url_for(\".frontend_index\")\n-\n-    @backend.route(\"/be\")\n-    def backend_index():\n-        return flask.url_for(\"myapp.frontend.frontend_index\")\n-\n-    app.register_blueprint(frontend)\n-    app.register_blueprint(backend)\n-\n-    assert client.get(\"/fe\").data.strip() == b\"/be\"\n-    assert client.get(\"/fe2\").data.strip() == b\"/fe\"\n-    assert client.get(\"/be\").data.strip() == b\"/fe\"\n+def test_dotted_name_not_allowed(app, client):\n+    with pytest.raises(ValueError):\n+        flask.Blueprint(\"app.ui\", __name__)\n \n \n def test_dotted_names_from_app(app, client):\n@@ -343,62 +322,19 @@ def test_route_decorator_custom_endpoint(app, client):\n def test_route_decorator_custom_endpoint_with_dots(app, client):\n     bp = flask.Blueprint(\"bp\", __name__)\n \n-    @bp.route(\"/foo\")\n-    def foo():\n-        return flask.request.endpoint\n+    with pytest.raises(ValueError):\n+        bp.route(\"/\", endpoint=\"a.b\")(lambda: \"\")\n \n-    try:\n+    with pytest.raises(ValueError):\n+        bp.add_url_rule(\"/\", endpoint=\"a.b\")\n \n-        @bp.route(\"/bar\", endpoint=\"bar.bar\")\n-        def foo_bar():\n-            return flask.request.endpoint\n+    def view():\n+        return \"\"\n \n-    except AssertionError:\n-        pass\n-    else:\n-        raise AssertionError(\"expected AssertionError not raised\")\n+    view.__name__ = \"a.b\"\n \n-    try:\n-\n-        @bp.route(\"/bar/123\", endpoint=\"bar.123\")\n-        def foo_bar_foo():\n-            return flask.request.endpoint\n-\n-    except AssertionError:\n-        pass\n-    else:\n-        raise AssertionError(\"expected AssertionError not raised\")\n-\n-    def foo_foo_foo():\n-        pass\n-\n-    pytest.raises(\n-        AssertionError,\n-        lambda: bp.add_url_rule(\"/bar/123\", endpoint=\"bar.123\", view_func=foo_foo_foo),\n-    )\n-\n-    pytest.raises(\n-        AssertionError, bp.route(\"/bar/123\", endpoint=\"bar.123\"), lambda: None\n-    )\n-\n-    foo_foo_foo.__name__ = \"bar.123\"\n-\n-    pytest.raises(\n-        AssertionError, lambda: bp.add_url_rule(\"/bar/123\", view_func=foo_foo_foo)\n-    )\n-\n-    bp.add_url_rule(\n-        \"/bar/456\", endpoint=\"foofoofoo\", view_func=functools.partial(foo_foo_foo)\n-    )\n-\n-    app.register_blueprint(bp, url_prefix=\"/py\")\n-\n-    assert client.get(\"/py/foo\").data == b\"bp.foo\"\n-    # The rule's didn't actually made it through\n-    rv = client.get(\"/py/bar\")\n-    assert rv.status_code == 404\n-    rv = client.get(\"/py/bar/123\")\n-    assert rv.status_code == 404\n+    with pytest.raises(ValueError):\n+        bp.add_url_rule(\"/\", view_func=view)\n \n \n def test_endpoint_decorator(app, client):\n",
+    "metrics": {
+      "total_input_tokens": 3096120,
+      "total_output_tokens": 19545,
+      "llm_calls": 53,
+      "tool_calls": 52,
+      "compressions": 0,
+      "messages_dropped": 0,
+      "wall_time_seconds": 237.65794277191162,
+      "message_count": 107,
+      "trajectory": [
+        {
+          "step": 0,
+          "message_count": 3,
+          "total_tokens": 1365,
+          "compressions_so_far": 0,
+          "timestamp": 1.5099291801452637
+        },
+        {
+          "step": 1,
+          "message_count": 5,
+          "total_tokens": 4041,
+          "compressions_so_far": 0,
+          "timestamp": 2.6942059993743896
+        },
+        {
+          "step": 2,
+          "message_count": 7,
+          "total_tokens": 6882,
+          "compressions_so_far": 0,
+          "timestamp": 4.889393091201782
+        },
+        {
+          "step": 3,
+          "message_count": 9,
+          "total_tokens": 9799,
+          "compressions_so_far": 0,
+          "timestamp": 6.220643997192383
+        },
+        {
+          "step": 4,
+          "message_count": 11,
+          "total_tokens": 12909,
+          "compressions_so_far": 0,
+          "timestamp": 7.916392087936401
+        },
+        {
+          "step": 5,
+          "message_count": 13,
+          "total_tokens": 16108,
+          "compressions_so_far": 0,
+          "timestamp": 9.656042098999023
+        },
+        {
+          "step": 6,
+          "message_count": 15,
+          "total_tokens": 19408,
+          "compressions_so_far": 0,
+          "timestamp": 10.898226976394653
+        },
+        {
+          "step": 7,
+          "message_count": 17,
+          "total_tokens": 24029,
+          "compressions_so_far": 0,
+          "timestamp": 12.112972974777222
+        },
+        {
+          "step": 8,
+          "message_count": 19,
+          "total_tokens": 34495,
+          "compressions_so_far": 0,
+          "timestamp": 14.87593412399292
+        },
+        {
+          "step": 9,
+          "message_count": 21,
+          "total_tokens": 45051,
+          "compressions_so_far": 0,
+          "timestamp": 16.001210927963257
+        },
+        {
+          "step": 10,
+          "message_count": 23,
+          "total_tokens": 55692,
+          "compressions_so_far": 0,
+          "timestamp": 17.279664039611816
+        },
+        {
+          "step": 11,
+          "message_count": 25,
+          "total_tokens": 66415,
+          "compressions_so_far": 0,
+          "timestamp": 18.7654390335083
+        },
+        {
+          "step": 12,
+          "message_count": 27,
+          "total_tokens": 85094,
+          "compressions_so_far": 0,
+          "timestamp": 20.921651124954224
+        },
+        {
+          "step": 13,
+          "message_count": 29,
+          "total_tokens": 103884,
+          "compressions_so_far": 0,
+          "timestamp": 22.25218391418457
+        },
+        {
+          "step": 14,
+          "message_count": 31,
+          "total_tokens": 137044,
+          "compressions_so_far": 0,
+          "timestamp": 27.57519507408142
+        },
+        {
+          "step": 15,
+          "message_count": 33,
+          "total_tokens": 170789,
+          "compressions_so_far": 0,
+          "timestamp": 29.41783094406128
+        },
+        {
+          "step": 16,
+          "message_count": 35,
+          "total_tokens": 204702,
+          "compressions_so_far": 0,
+          "timestamp": 31.774047136306763
+        },
+        {
+          "step": 17,
+          "message_count": 37,
+          "total_tokens": 241006,
+          "compressions_so_far": 0,
+          "timestamp": 34.0282199382782
+        },
+        {
+          "step": 18,
+          "message_count": 39,
+          "total_tokens": 287010,
+          "compressions_so_far": 0,
+          "timestamp": 65.75871396064758
+        },
+        {
+          "step": 19,
+          "message_count": 41,
+          "total_tokens": 333201,
+          "compressions_so_far": 0,
+          "timestamp": 96.73473811149597
+        },
+        {
+          "step": 20,
+          "message_count": 43,
+          "total_tokens": 375464,
+          "compressions_so_far": 0,
+          "timestamp": 98.49081993103027
+        },
+        {
+          "step": 21,
+          "message_count": 45,
+          "total_tokens": 417881,
+          "compressions_so_far": 0,
+          "timestamp": 101.09950613975525
+        },
+        {
+          "step": 22,
+          "message_count": 47,
+          "total_tokens": 460388,
+          "compressions_so_far": 0,
+          "timestamp": 103.24913692474365
+        },
+        {
+          "step": 23,
+          "message_count": 49,
+          "total_tokens": 512620,
+          "compressions_so_far": 0,
+          "timestamp": 134.59674501419067
+        },
+        {
+          "step": 24,
+          "message_count": 51,
+          "total_tokens": 561030,
+          "compressions_so_far": 0,
+          "timestamp": 137.25783801078796
+        },
+        {
+          "step": 25,
+          "message_count": 53,
+          "total_tokens": 615919,
+          "compressions_so_far": 0,
+          "timestamp": 140.04130291938782
+        },
+        {
+          "step": 26,
+          "message_count": 55,
+          "total_tokens": 670993,
+          "compressions_so_far": 0,
+          "timestamp": 142.36757111549377
+        },
+        {
+          "step": 27,
+          "message_count": 57,
+          "total_tokens": 726164,
+          "compressions_so_far": 0,
+          "timestamp": 144.51752305030823
+        },
+        {
+          "step": 28,
+          "message_count": 59,
+          "total_tokens": 787255,
+          "compressions_so_far": 0,
+          "timestamp": 149.5356628894806
+        },
+        {
+          "step": 29,
+          "message_count": 61,
+          "total_tokens": 848520,
+          "compressions_so_far": 0,
+          "timestamp": 151.5708601474762
+        },
+        {
+          "step": 30,
+          "message_count": 63,
+          "total_tokens": 909903,
+          "compressions_so_far": 0,
+          "timestamp": 155.68924808502197
+        },
+        {
+          "step": 31,
+          "message_count": 65,
+          "total_tokens": 971430,
+          "compressions_so_far": 0,
+          "timestamp": 158.54630398750305
+        },
+        {
+          "step": 32,
+          "message_count": 67,
+          "total_tokens": 1040345,
+          "compressions_so_far": 0,
+          "timestamp": 160.91201281547546
+        },
+        {
+          "step": 33,
+          "message_count": 69,
+          "total_tokens": 1109378,
+          "compressions_so_far": 0,
+          "timestamp": 162.84684920310974
+        },
+        {
+          "step": 34,
+          "message_count": 71,
+          "total_tokens": 1196153,
+          "compressions_so_far": 0,
+          "timestamp": 166.5359389781952
+        },
+        {
+          "step": 35,
+          "message_count": 73,
+          "total_tokens": 1283031,
+          "compressions_so_far": 0,
+          "timestamp": 169.7895791530609
+        },
+        {
+          "step": 36,
+          "message_count": 75,
+          "total_tokens": 1387752,
+          "compressions_so_far": 0,
+          "timestamp": 173.9050168991089
+        },
+        {
+          "step": 37,
+          "message_count": 77,
+          "total_tokens": 1492643,
+          "compressions_so_far": 0,
+          "timestamp": 177.6825590133667
+        },
+        {
+          "step": 38,
+          "message_count": 79,
+          "total_tokens": 1597763,
+          "compressions_so_far": 0,
+          "timestamp": 180.4777171611786
+        },
+        {
+          "step": 39,
+          "message_count": 81,
+          "total_tokens": 1703052,
+          "compressions_so_far": 0,
+          "timestamp": 184.35025811195374
+        },
+        {
+          "step": 40,
+          "message_count": 83,
+          "total_tokens": 1808524,
+          "compressions_so_far": 0,
+          "timestamp": 187.52411198616028
+        },
+        {
+          "step": 41,
+          "message_count": 85,
+          "total_tokens": 1914205,
+          "compressions_so_far": 0,
+          "timestamp": 190.5966329574585
+        },
+        {
+          "step": 42,
+          "message_count": 87,
+          "total_tokens": 2020073,
+          "compressions_so_far": 0,
+          "timestamp": 193.8738021850586
+        },
+        {
+          "step": 43,
+          "message_count": 89,
+          "total_tokens": 2126491,
+          "compressions_so_far": 0,
+          "timestamp": 197.03130102157593
+        },
+        {
+          "step": 44,
+          "message_count": 91,
+          "total_tokens": 2233513,
+          "compressions_so_far": 0,
+          "timestamp": 201.55587601661682
+        },
+        {
+          "step": 45,
+          "message_count": 93,
+          "total_tokens": 2341881,
+          "compressions_so_far": 0,
+          "timestamp": 205.41737508773804
+        },
+        {
+          "step": 46,
+          "message_count": 95,
+          "total_tokens": 2451366,
+          "compressions_so_far": 0,
+          "timestamp": 211.9632430076599
+        },
+        {
+          "step": 47,
+          "message_count": 97,
+          "total_tokens": 2560951,
+          "compressions_so_far": 0,
+          "timestamp": 215.78883481025696
+        },
+        {
+          "step": 48,
+          "message_count": 99,
+          "total_tokens": 2670753,
+          "compressions_so_far": 0,
+          "timestamp": 219.38476300239563
+        },
+        {
+          "step": 49,
+          "message_count": 101,
+          "total_tokens": 2780844,
+          "compressions_so_far": 0,
+          "timestamp": 222.4854691028595
+        },
+        {
+          "step": 50,
+          "message_count": 103,
+          "total_tokens": 2891534,
+          "compressions_so_far": 0,
+          "timestamp": 225.29358386993408
+        },
+        {
+          "step": 51,
+          "message_count": 105,
+          "total_tokens": 3003190,
+          "compressions_so_far": 0,
+          "timestamp": 230.40193486213684
+        },
+        {
+          "step": 52,
+          "message_count": 107,
+          "total_tokens": 3115665,
+          "compressions_so_far": 0,
+          "timestamp": 237.65791702270508
+        }
+      ]
+    },
+    "error": null
+  },
+  {
+    "instance_id": "pallets__flask-4045",
+    "agent_type": "focus",
+    "model": "claude-haiku-4-5-20251001",
+    "success": true,
+    "patch": "diff --git a/src/flask/blueprints.py b/src/flask/blueprints.py\nindex 5fb84d86..85d8225e 100644\n--- a/src/flask/blueprints.py\n+++ b/src/flask/blueprints.py\n@@ -188,6 +188,7 @@ class Blueprint(Scaffold):\n             template_folder=template_folder,\n             root_path=root_path,\n         )\n+        assert \".\" not in name, \"Blueprint names should not contain dots\"\n         self.name = name\n         self.url_prefix = url_prefix\n         self.subdomain = subdomain\n",
+    "metrics": {
+      "total_input_tokens": 1246942,
+      "total_output_tokens": 15131,
+      "llm_calls": 47,
+      "tool_calls": 46,
+      "compressions": 1,
+      "messages_dropped": 25,
+      "wall_time_seconds": 177.99969100952148,
+      "message_count": 70,
+      "trajectory": [
+        {
+          "step": 0,
+          "message_count": 3,
+          "total_tokens": 2080,
+          "compressions_so_far": 0,
+          "timestamp": 1.9338769912719727
+        },
+        {
+          "step": 1,
+          "message_count": 5,
+          "total_tokens": 4270,
+          "compressions_so_far": 0,
+          "timestamp": 3.011021852493286
+        },
+        {
+          "step": 2,
+          "message_count": 7,
+          "total_tokens": 6625,
+          "compressions_so_far": 0,
+          "timestamp": 5.370635032653809
+        },
+        {
+          "step": 3,
+          "message_count": 9,
+          "total_tokens": 9056,
+          "compressions_so_far": 0,
+          "timestamp": 6.905388116836548
+        },
+        {
+          "step": 4,
+          "message_count": 11,
+          "total_tokens": 11698,
+          "compressions_so_far": 0,
+          "timestamp": 8.38032579421997
+        },
+        {
+          "step": 5,
+          "message_count": 13,
+          "total_tokens": 14443,
+          "compressions_so_far": 0,
+          "timestamp": 10.136734962463379
+        },
+        {
+          "step": 6,
+          "message_count": 15,
+          "total_tokens": 17278,
+          "compressions_so_far": 0,
+          "timestamp": 11.263492822647095
+        },
+        {
+          "step": 7,
+          "message_count": 17,
+          "total_tokens": 25897,
+          "compressions_so_far": 0,
+          "timestamp": 13.781495094299316
+        },
+        {
+          "step": 8,
+          "message_count": 19,
+          "total_tokens": 34598,
+          "compressions_so_far": 0,
+          "timestamp": 14.863359928131104
+        },
+        {
+          "step": 9,
+          "message_count": 21,
+          "total_tokens": 51266,
+          "compressions_so_far": 0,
+          "timestamp": 17.147480010986328
+        },
+        {
+          "step": 10,
+          "message_count": 23,
+          "total_tokens": 68021,
+          "compressions_so_far": 0,
+          "timestamp": 18.698230028152466
+        },
+        {
+          "step": 11,
+          "message_count": 25,
+          "total_tokens": 98995,
+          "compressions_so_far": 0,
+          "timestamp": 22.06041193008423
+        },
+        {
+          "step": 12,
+          "message_count": 27,
+          "total_tokens": 138640,
+          "compressions_so_far": 0,
+          "timestamp": 24.266721963882446
+        },
+        {
+          "step": 13,
+          "message_count": 29,
+          "total_tokens": 178542,
+          "compressions_so_far": 0,
+          "timestamp": 27.726317167282104
+        },
+        {
+          "step": 14,
+          "message_count": 4,
+          "total_tokens": 178542,
+          "compressions_so_far": 1,
+          "timestamp": 27.729206085205078
+        },
+        {
+          "step": 14,
+          "message_count": 6,
+          "total_tokens": 181000,
+          "compressions_so_far": 1,
+          "timestamp": 29.12934398651123
+        },
+        {
+          "step": 15,
+          "message_count": 8,
+          "total_tokens": 189254,
+          "compressions_so_far": 1,
+          "timestamp": 31.20586085319519
+        },
+        {
+          "step": 16,
+          "message_count": 10,
+          "total_tokens": 207233,
+          "compressions_so_far": 1,
+          "timestamp": 61.96440887451172
+        },
+        {
+          "step": 17,
+          "message_count": 12,
+          "total_tokens": 221337,
+          "compressions_so_far": 1,
+          "timestamp": 63.403002977371216
+        },
+        {
+          "step": 18,
+          "message_count": 14,
+          "total_tokens": 235529,
+          "compressions_so_far": 1,
+          "timestamp": 64.58594417572021
+        },
+        {
+          "step": 19,
+          "message_count": 16,
+          "total_tokens": 249893,
+          "compressions_so_far": 1,
+          "timestamp": 65.81460499763489
+        },
+        {
+          "step": 20,
+          "message_count": 18,
+          "total_tokens": 264417,
+          "compressions_so_far": 1,
+          "timestamp": 68.1715178489685
+        },
+        {
+          "step": 21,
+          "message_count": 20,
+          "total_tokens": 285419,
+          "compressions_so_far": 1,
+          "timestamp": 71.39711093902588
+        },
+        {
+          "step": 22,
+          "message_count": 22,
+          "total_tokens": 306519,
+          "compressions_so_far": 1,
+          "timestamp": 72.852303981781
+        },
+        {
+          "step": 23,
+          "message_count": 24,
+          "total_tokens": 337344,
+          "compressions_so_far": 1,
+          "timestamp": 104.69838380813599
+        },
+        {
+          "step": 24,
+          "message_count": 26,
+          "total_tokens": 364375,
+          "compressions_so_far": 1,
+          "timestamp": 108.14467191696167
+        },
+        {
+          "step": 25,
+          "message_count": 28,
+          "total_tokens": 391855,
+          "compressions_so_far": 1,
+          "timestamp": 112.27521681785583
+        },
+        {
+          "step": 26,
+          "message_count": 30,
+          "total_tokens": 419425,
+          "compressions_so_far": 1,
+          "timestamp": 113.91514182090759
+        },
+        {
+          "step": 27,
+          "message_count": 32,
+          "total_tokens": 452810,
+          "compressions_so_far": 1,
+          "timestamp": 117.32207989692688
+        },
+        {
+          "step": 28,
+          "message_count": 34,
+          "total_tokens": 486512,
+          "compressions_so_far": 1,
+          "timestamp": 119.44444584846497
+        },
+        {
+          "step": 29,
+          "message_count": 36,
+          "total_tokens": 520445,
+          "compressions_so_far": 1,
+          "timestamp": 121.59444880485535
+        },
+        {
+          "step": 30,
+          "message_count": 38,
+          "total_tokens": 554528,
+          "compressions_so_far": 1,
+          "timestamp": 123.7483479976654
+        },
+        {
+          "step": 31,
+          "message_count": 40,
+          "total_tokens": 589411,
+          "compressions_so_far": 1,
+          "timestamp": 128.86502981185913
+        },
+        {
+          "step": 32,
+          "message_count": 42,
+          "total_tokens": 624626,
+          "compressions_so_far": 1,
+          "timestamp": 131.2194540500641
+        },
+        {
+          "step": 33,
+          "message_count": 44,
+          "total_tokens": 660380,
+          "compressions_so_far": 1,
+          "timestamp": 133.2308738231659
+        },
+        {
+          "step": 34,
+          "message_count": 46,
+          "total_tokens": 696230,
+          "compressions_so_far": 1,
+          "timestamp": 135.00931406021118
+        },
+        {
+          "step": 35,
+          "message_count": 48,
+          "total_tokens": 740187,
+          "compressions_so_far": 1,
+          "timestamp": 139.24788570404053
+        },
+        {
+          "step": 36,
+          "message_count": 50,
+          "total_tokens": 784245,
+          "compressions_so_far": 1,
+          "timestamp": 141.25388073921204
+        },
+        {
+          "step": 37,
+          "message_count": 52,
+          "total_tokens": 828972,
+          "compressions_so_far": 1,
+          "timestamp": 146.37485098838806
+        },
+        {
+          "step": 38,
+          "message_count": 54,
+          "total_tokens": 873910,
+          "compressions_so_far": 1,
+          "timestamp": 148.83253407478333
+        },
+        {
+          "step": 39,
+          "message_count": 56,
+          "total_tokens": 919460,
+          "compressions_so_far": 1,
+          "timestamp": 151.49596190452576
+        },
+        {
+          "step": 40,
+          "message_count": 58,
+          "total_tokens": 965162,
+          "compressions_so_far": 1,
+          "timestamp": 153.5467767715454
+        },
+        {
+          "step": 41,
+          "message_count": 60,
+          "total_tokens": 1011024,
+          "compressions_so_far": 1,
+          "timestamp": 155.8360378742218
+        },
+        {
+          "step": 42,
+          "message_count": 62,
+          "total_tokens": 1057271,
+          "compressions_so_far": 1,
+          "timestamp": 159.27950286865234
+        },
+        {
+          "step": 43,
+          "message_count": 64,
+          "total_tokens": 1103619,
+          "compressions_so_far": 1,
+          "timestamp": 161.3257839679718
+        },
+        {
+          "step": 44,
+          "message_count": 66,
+          "total_tokens": 1155779,
+          "compressions_so_far": 1,
+          "timestamp": 165.01096081733704
+        },
+        {
+          "step": 45,
+          "message_count": 68,
+          "total_tokens": 1208695,
+          "compressions_so_far": 1,
+          "timestamp": 172.39234685897827
+        },
+        {
+          "step": 46,
+          "message_count": 70,
+          "total_tokens": 1262073,
+          "compressions_so_far": 1,
+          "timestamp": 177.99968004226685
+        }
+      ],
+      "knowledge_entries": 1,
+      "active_focuses": 0
+    },
+    "error": null
+  },
+  {
+    "instance_id": "psf__requests-2148",
+    "agent_type": "baseline",
+    "model": "claude-haiku-4-5-20251001",
+    "success": true,
+    "patch": "diff --git a/requests/models.py b/requests/models.py\nindex 0dc55568..2ababaf8 100644\n--- a/requests/models.py\n+++ b/requests/models.py\n@@ -9,6 +9,7 @@ This module contains the primary objects that power Requests.\n \n import collections\n import datetime\n+import socket\n \n from io import BytesIO, UnsupportedOperation\n from .hooks import default_hooks\n@@ -22,7 +23,7 @@ from .packages.urllib3.util import parse_url\n from .packages.urllib3.exceptions import DecodeError\n from .exceptions import (\n     HTTPError, RequestException, MissingSchema, InvalidURL,\n-    ChunkedEncodingError, ContentDecodingError)\n+    ChunkedEncodingError, ContentDecodingError, ConnectionError)\n from .utils import (\n     guess_filename, get_auth_from_url, requote_uri,\n     stream_decode_response_unicode, to_key_val_list, parse_header_links,\n@@ -640,6 +641,8 @@ class Response(object):\n                     raise ChunkedEncodingError(e)\n                 except DecodeError as e:\n                     raise ContentDecodingError(e)\n+                except socket.error as e:\n+                    raise ConnectionError(e)\n             except AttributeError:\n                 # Standard file-like object.\n                 while True:\n",
+    "metrics": {
+      "total_input_tokens": 2456293,
+      "total_output_tokens": 16669,
+      "llm_calls": 54,
+      "tool_calls": 53,
+      "compressions": 0,
+      "messages_dropped": 0,
+      "wall_time_seconds": 204.3208167552948,
+      "message_count": 109,
+      "trajectory": [
+        {
+          "step": 0,
+          "message_count": 3,
+          "total_tokens": 2190,
+          "compressions_so_far": 0,
+          "timestamp": 2.525240659713745
+        },
+        {
+          "step": 1,
+          "message_count": 5,
+          "total_tokens": 5621,
+          "compressions_so_far": 0,
+          "timestamp": 4.115205764770508
+        },
+        {
+          "step": 2,
+          "message_count": 7,
+          "total_tokens": 9203,
+          "compressions_so_far": 0,
+          "timestamp": 5.225755929946899
+        },
+        {
+          "step": 3,
+          "message_count": 9,
+          "total_tokens": 19916,
+          "compressions_so_far": 0,
+          "timestamp": 6.58930778503418
+        },
+        {
+          "step": 4,
+          "message_count": 11,
+          "total_tokens": 31163,
+          "compressions_so_far": 0,
+          "timestamp": 8.136101722717285
+        },
+        {
+          "step": 5,
+          "message_count": 13,
+          "total_tokens": 43557,
+          "compressions_so_far": 0,
+          "timestamp": 9.858032703399658
+        },
+        {
+          "step": 6,
+          "message_count": 15,
+          "total_tokens": 56049,
+          "compressions_so_far": 0,
+          "timestamp": 11.10573959350586
+        },
+        {
+          "step": 7,
+          "message_count": 17,
+          "total_tokens": 68920,
+          "compressions_so_far": 0,
+          "timestamp": 12.298706769943237
+        },
+        {
+          "step": 8,
+          "message_count": 19,
+          "total_tokens": 86000,
+          "compressions_so_far": 0,
+          "timestamp": 16.932939767837524
+        },
+        {
+          "step": 9,
+          "message_count": 21,
+          "total_tokens": 103313,
+          "compressions_so_far": 0,
+          "timestamp": 19.082300901412964
+        },
+        {
+          "step": 10,
+          "message_count": 23,
+          "total_tokens": 121651,
+          "compressions_so_far": 0,
+          "timestamp": 21.946061849594116
+        },
+        {
+          "step": 11,
+          "message_count": 25,
+          "total_tokens": 140171,
+          "compressions_so_far": 0,
+          "timestamp": 24.95224666595459
+        },
+        {
+          "step": 12,
+          "message_count": 27,
+          "total_tokens": 158943,
+          "compressions_so_far": 0,
+          "timestamp": 27.288983821868896
+        },
+        {
+          "step": 13,
+          "message_count": 29,
+          "total_tokens": 177956,
+          "compressions_so_far": 0,
+          "timestamp": 30.448588609695435
+        },
+        {
+          "step": 14,
+          "message_count": 31,
+          "total_tokens": 204109,
+          "compressions_so_far": 0,
+          "timestamp": 32.42848992347717
+        },
+        {
+          "step": 15,
+          "message_count": 33,
+          "total_tokens": 241396,
+          "compressions_so_far": 0,
+          "timestamp": 62.57218098640442
+        },
+        {
+          "step": 16,
+          "message_count": 35,
+          "total_tokens": 274780,
+          "compressions_so_far": 0,
+          "timestamp": 64.03403496742249
+        },
+        {
+          "step": 17,
+          "message_count": 37,
+          "total_tokens": 308307,
+          "compressions_so_far": 0,
+          "timestamp": 66.54190587997437
+        },
+        {
+          "step": 18,
+          "message_count": 39,
+          "total_tokens": 342027,
+          "compressions_so_far": 0,
+          "timestamp": 68.54178977012634
+        },
+        {
+          "step": 19,
+          "message_count": 41,
+          "total_tokens": 375839,
+          "compressions_so_far": 0,
+          "timestamp": 72.73745274543762
+        },
+        {
+          "step": 20,
+          "message_count": 43,
+          "total_tokens": 416814,
+          "compressions_so_far": 0,
+          "timestamp": 76.01805686950684
+        },
+        {
+          "step": 21,
+          "message_count": 45,
+          "total_tokens": 465870,
+          "compressions_so_far": 0,
+          "timestamp": 83.98788189888
+        },
+        {
+          "step": 22,
+          "message_count": 47,
+          "total_tokens": 515007,
+          "compressions_so_far": 0,
+          "timestamp": 87.95345377922058
+        },
+        {
+          "step": 23,
+          "message_count": 49,
+          "total_tokens": 571867,
+          "compressions_so_far": 0,
+          "timestamp": 94.3448257446289
+        },
+        {
+          "step": 24,
+          "message_count": 51,
+          "total_tokens": 628824,
+          "compressions_so_far": 0,
+          "timestamp": 96.49489259719849
+        },
+        {
+          "step": 25,
+          "message_count": 53,
+          "total_tokens": 686208,
+          "compressions_so_far": 0,
+          "timestamp": 99.5238847732544
+        },
+        {
+          "step": 26,
+          "message_count": 55,
+          "total_tokens": 743739,
+          "compressions_so_far": 0,
+          "timestamp": 101.86460280418396
+        },
+        {
+          "step": 27,
+          "message_count": 57,
+          "total_tokens": 801432,
+          "compressions_so_far": 0,
+          "timestamp": 103.96986484527588
+        },
+        {
+          "step": 28,
+          "message_count": 59,
+          "total_tokens": 859286,
+          "compressions_so_far": 0,
+          "timestamp": 106.12115478515625
+        },
+        {
+          "step": 29,
+          "message_count": 61,
+          "total_tokens": 918041,
+          "compressions_so_far": 0,
+          "timestamp": 109.70429587364197
+        },
+        {
+          "step": 30,
+          "message_count": 63,
+          "total_tokens": 976942,
+          "compressions_so_far": 0,
+          "timestamp": 111.83642077445984
+        },
+        {
+          "step": 31,
+          "message_count": 65,
+          "total_tokens": 1036340,
+          "compressions_so_far": 0,
+          "timestamp": 113.98714971542358
+        },
+        {
+          "step": 32,
+          "message_count": 67,
+          "total_tokens": 1095969,
+          "compressions_so_far": 0,
+          "timestamp": 116.25727891921997
+        },
+        {
+          "step": 33,
+          "message_count": 69,
+          "total_tokens": 1156118,
+          "compressions_so_far": 0,
+          "timestamp": 118.49698090553284
+        },
+        {
+          "step": 34,
+          "message_count": 71,
+          "total_tokens": 1216678,
+          "compressions_so_far": 0,
+          "timestamp": 120.55742692947388
+        },
+        {
+          "step": 35,
+          "message_count": 73,
+          "total_tokens": 1278051,
+          "compressions_so_far": 0,
+          "timestamp": 124.95576071739197
+        },
+        {
+          "step": 36,
+          "message_count": 75,
+          "total_tokens": 1339609,
+          "compressions_so_far": 0,
+          "timestamp": 129.04480266571045
+        },
+        {
+          "step": 37,
+          "message_count": 77,
+          "total_tokens": 1402137,
+          "compressions_so_far": 0,
+          "timestamp": 134.91541576385498
+        },
+        {
+          "step": 38,
+          "message_count": 79,
+          "total_tokens": 1465294,
+          "compressions_so_far": 0,
+          "timestamp": 138.17188668251038
+        },
+        {
+          "step": 39,
+          "message_count": 81,
+          "total_tokens": 1528586,
+          "compressions_so_far": 0,
+          "timestamp": 142.3104248046875
+        },
+        {
+          "step": 40,
+          "message_count": 83,
+          "total_tokens": 1592052,
+          "compressions_so_far": 0,
+          "timestamp": 144.72598385810852
+        },
+        {
+          "step": 41,
+          "message_count": 85,
+          "total_tokens": 1655806,
+          "compressions_so_far": 0,
+          "timestamp": 148.20658159255981
+        },
+        {
+          "step": 42,
+          "message_count": 87,
+          "total_tokens": 1720182,
+          "compressions_so_far": 0,
+          "timestamp": 150.66385674476624
+        },
+        {
+          "step": 43,
+          "message_count": 89,
+          "total_tokens": 1784767,
+          "compressions_so_far": 0,
+          "timestamp": 153.01881766319275
+        },
+        {
+          "step": 44,
+          "message_count": 91,
+          "total_tokens": 1849615,
+          "compressions_so_far": 0,
+          "timestamp": 155.47300481796265
+        },
+        {
+          "step": 45,
+          "message_count": 93,
+          "total_tokens": 1915949,
+          "compressions_so_far": 0,
+          "timestamp": 164.2827136516571
+        },
+        {
+          "step": 46,
+          "message_count": 95,
+          "total_tokens": 1983315,
+          "compressions_so_far": 0,
+          "timestamp": 172.06561994552612
+        },
+        {
+          "step": 47,
+          "message_count": 97,
+          "total_tokens": 2051622,
+          "compressions_so_far": 0,
+          "timestamp": 176.26311564445496
+        },
+        {
+          "step": 48,
+          "message_count": 99,
+          "total_tokens": 2120182,
+          "compressions_so_far": 0,
+          "timestamp": 178.61949491500854
+        },
+        {
+          "step": 49,
+          "message_count": 101,
+          "total_tokens": 2189339,
+          "compressions_so_far": 0,
+          "timestamp": 181.58862376213074
+        },
+        {
+          "step": 50,
+          "message_count": 103,
+          "total_tokens": 2259280,
+          "compressions_so_far": 0,
+          "timestamp": 188.77037286758423
+        },
+        {
+          "step": 51,
+          "message_count": 105,
+          "total_tokens": 2329936,
+          "compressions_so_far": 0,
+          "timestamp": 192.0235948562622
+        },
+        {
+          "step": 52,
+          "message_count": 107,
+          "total_tokens": 2401190,
+          "compressions_so_far": 0,
+          "timestamp": 196.88567280769348
+        },
+        {
+          "step": 53,
+          "message_count": 109,
+          "total_tokens": 2472962,
+          "compressions_so_far": 0,
+          "timestamp": 204.320809841156
+        }
+      ]
+    },
+    "error": null
+  },
+  {
+    "instance_id": "psf__requests-2148",
+    "agent_type": "focus",
+    "model": "claude-haiku-4-5-20251001",
+    "success": true,
+    "patch": "diff --git a/requests/models.py b/requests/models.py\nindex 0dc55568..98639e1e 100644\n--- a/requests/models.py\n+++ b/requests/models.py\n@@ -9,6 +9,7 @@ This module contains the primary objects that power Requests.\n \n import collections\n import datetime\n+import socket\n \n from io import BytesIO, UnsupportedOperation\n from .hooks import default_hooks\n@@ -22,7 +23,7 @@ from .packages.urllib3.util import parse_url\n from .packages.urllib3.exceptions import DecodeError\n from .exceptions import (\n     HTTPError, RequestException, MissingSchema, InvalidURL,\n-    ChunkedEncodingError, ContentDecodingError)\n+    ChunkedEncodingError, ContentDecodingError, ConnectionError)\n from .utils import (\n     guess_filename, get_auth_from_url, requote_uri,\n     stream_decode_response_unicode, to_key_val_list, parse_header_links,\n@@ -640,10 +641,15 @@ class Response(object):\n                     raise ChunkedEncodingError(e)\n                 except DecodeError as e:\n                     raise ContentDecodingError(e)\n+                except socket.error as e:\n+                    raise ConnectionError(e)\n             except AttributeError:\n                 # Standard file-like object.\n                 while True:\n-                    chunk = self.raw.read(chunk_size)\n+                    try:\n+                        chunk = self.raw.read(chunk_size)\n+                    except socket.error as e:\n+                        raise ConnectionError(e)\n                     if not chunk:\n                         break\n                     yield chunk\n",
+    "metrics": {
+      "total_input_tokens": 1461028,
+      "total_output_tokens": 25162,
+      "llm_calls": 54,
+      "tool_calls": 53,
+      "compressions": 2,
+      "messages_dropped": 34,
+      "wall_time_seconds": 235.24810814857483,
+      "message_count": 75,
+      "trajectory": [
+        {
+          "step": 0,
+          "message_count": 3,
+          "total_tokens": 2947,
+          "compressions_so_far": 0,
+          "timestamp": 2.452094316482544
+        },
+        {
+          "step": 1,
+          "message_count": 5,
+          "total_tokens": 7156,
+          "compressions_so_far": 0,
+          "timestamp": 3.515397310256958
+        },
+        {
+          "step": 2,
+          "message_count": 7,
+          "total_tokens": 11564,
+          "compressions_so_far": 0,
+          "timestamp": 5.503099203109741
+        },
+        {
+          "step": 3,
+          "message_count": 9,
+          "total_tokens": 16080,
+          "compressions_so_far": 0,
+          "timestamp": 6.452576160430908
+        },
+        {
+          "step": 4,
+          "message_count": 11,
+          "total_tokens": 27728,
+          "compressions_so_far": 0,
+          "timestamp": 7.59800910949707
+        },
+        {
+          "step": 5,
+          "message_count": 13,
+          "total_tokens": 39987,
+          "compressions_so_far": 0,
+          "timestamp": 9.729565382003784
+        },
+        {
+          "step": 6,
+          "message_count": 15,
+          "total_tokens": 52333,
+          "compressions_so_far": 0,
+          "timestamp": 11.163604259490967
+        },
+        {
+          "step": 7,
+          "message_count": 17,
+          "total_tokens": 65864,
+          "compressions_so_far": 0,
+          "timestamp": 13.518023252487183
+        },
+        {
+          "step": 8,
+          "message_count": 19,
+          "total_tokens": 79559,
+          "compressions_so_far": 0,
+          "timestamp": 15.055651187896729
+        },
+        {
+          "step": 9,
+          "message_count": 21,
+          "total_tokens": 93513,
+          "compressions_so_far": 0,
+          "timestamp": 17.21381402015686
+        },
+        {
+          "step": 10,
+          "message_count": 23,
+          "total_tokens": 114844,
+          "compressions_so_far": 0,
+          "timestamp": 21.464165210723877
+        },
+        {
+          "step": 11,
+          "message_count": 8,
+          "total_tokens": 114844,
+          "compressions_so_far": 1,
+          "timestamp": 21.4653742313385
+        },
+        {
+          "step": 11,
+          "message_count": 10,
+          "total_tokens": 119606,
+          "compressions_so_far": 1,
+          "timestamp": 22.690989017486572
+        },
+        {
+          "step": 12,
+          "message_count": 12,
+          "total_tokens": 131499,
+          "compressions_so_far": 1,
+          "timestamp": 24.372676134109497
+        },
+        {
+          "step": 13,
+          "message_count": 14,
+          "total_tokens": 144147,
+          "compressions_so_far": 1,
+          "timestamp": 27.547460079193115
+        },
+        {
+          "step": 14,
+          "message_count": 16,
+          "total_tokens": 156920,
+          "compressions_so_far": 1,
+          "timestamp": 29.801332235336304
+        },
+        {
+          "step": 15,
+          "message_count": 18,
+          "total_tokens": 180848,
+          "compressions_so_far": 1,
+          "timestamp": 59.70429730415344
+        },
+        {
+          "step": 16,
+          "message_count": 20,
+          "total_tokens": 200861,
+          "compressions_so_far": 1,
+          "timestamp": 61.543034076690674
+        },
+        {
+          "step": 17,
+          "message_count": 22,
+          "total_tokens": 220968,
+          "compressions_so_far": 1,
+          "timestamp": 63.39476299285889
+        },
+        {
+          "step": 18,
+          "message_count": 24,
+          "total_tokens": 241220,
+          "compressions_so_far": 1,
+          "timestamp": 67.30018830299377
+        },
+        {
+          "step": 19,
+          "message_count": 26,
+          "total_tokens": 261565,
+          "compressions_so_far": 1,
+          "timestamp": 68.71210718154907
+        },
+        {
+          "step": 20,
+          "message_count": 28,
+          "total_tokens": 289331,
+          "compressions_so_far": 1,
+          "timestamp": 72.09110713005066
+        },
+        {
+          "step": 21,
+          "message_count": 30,
+          "total_tokens": 317878,
+          "compressions_so_far": 1,
+          "timestamp": 77.51977801322937
+        },
+        {
+          "step": 22,
+          "message_count": 32,
+          "total_tokens": 346512,
+          "compressions_so_far": 1,
+          "timestamp": 78.83204627037048
+        },
+        {
+          "step": 23,
+          "message_count": 34,
+          "total_tokens": 382640,
+          "compressions_so_far": 1,
+          "timestamp": 83.3145489692688
+        },
+        {
+          "step": 24,
+          "message_count": 15,
+          "total_tokens": 382640,
+          "compressions_so_far": 2,
+          "timestamp": 83.31563711166382
+        },
+        {
+          "step": 24,
+          "message_count": 17,
+          "total_tokens": 395686,
+          "compressions_so_far": 2,
+          "timestamp": 84.7091293334961
+        },
+        {
+          "step": 25,
+          "message_count": 19,
+          "total_tokens": 415933,
+          "compressions_so_far": 2,
+          "timestamp": 87.01152324676514
+        },
+        {
+          "step": 26,
+          "message_count": 21,
+          "total_tokens": 443529,
+          "compressions_so_far": 2,
+          "timestamp": 91.56995129585266
+        },
+        {
+          "step": 27,
+          "message_count": 23,
+          "total_tokens": 472429,
+          "compressions_so_far": 2,
+          "timestamp": 95.13298511505127
+        },
+        {
+          "step": 28,
+          "message_count": 25,
+          "total_tokens": 502650,
+          "compressions_so_far": 2,
+          "timestamp": 102.4050223827362
+        },
+        {
+          "step": 29,
+          "message_count": 27,
+          "total_tokens": 533008,
+          "compressions_so_far": 2,
+          "timestamp": 104.65594124794006
+        },
+        {
+          "step": 30,
+          "message_count": 29,
+          "total_tokens": 563513,
+          "compressions_so_far": 2,
+          "timestamp": 106.60065937042236
+        },
+        {
+          "step": 31,
+          "message_count": 31,
+          "total_tokens": 594472,
+          "compressions_so_far": 2,
+          "timestamp": 110.06173324584961
+        },
+        {
+          "step": 32,
+          "message_count": 33,
+          "total_tokens": 625669,
+          "compressions_so_far": 2,
+          "timestamp": 112.13035106658936
+        },
+        {
+          "step": 33,
+          "message_count": 35,
+          "total_tokens": 657264,
+          "compressions_so_far": 2,
+          "timestamp": 113.8906180858612
+        },
+        {
+          "step": 34,
+          "message_count": 37,
+          "total_tokens": 689456,
+          "compressions_so_far": 2,
+          "timestamp": 117.67513513565063
+        },
+        {
+          "step": 35,
+          "message_count": 39,
+          "total_tokens": 722771,
+          "compressions_so_far": 2,
+          "timestamp": 125.88309621810913
+        },
+        {
+          "step": 36,
+          "message_count": 41,
+          "total_tokens": 756884,
+          "compressions_so_far": 2,
+          "timestamp": 130.6659960746765
+        },
+        {
+          "step": 37,
+          "message_count": 43,
+          "total_tokens": 792589,
+          "compressions_so_far": 2,
+          "timestamp": 138.85676431655884
+        },
+        {
+          "step": 38,
+          "message_count": 45,
+          "total_tokens": 829356,
+          "compressions_so_far": 2,
+          "timestamp": 146.12695908546448
+        },
+        {
+          "step": 39,
+          "message_count": 47,
+          "total_tokens": 866645,
+          "compressions_so_far": 2,
+          "timestamp": 149.51380825042725
+        },
+        {
+          "step": 40,
+          "message_count": 49,
+          "total_tokens": 906063,
+          "compressions_so_far": 2,
+          "timestamp": 160.25940203666687
+        },
+        {
+          "step": 41,
+          "message_count": 51,
+          "total_tokens": 945618,
+          "compressions_so_far": 2,
+          "timestamp": 162.71589922904968
+        },
+        {
+          "step": 42,
+          "message_count": 53,
+          "total_tokens": 985324,
+          "compressions_so_far": 2,
+          "timestamp": 164.56131315231323
+        },
+        {
+          "step": 43,
+          "message_count": 55,
+          "total_tokens": 1025354,
+          "compressions_so_far": 2,
+          "timestamp": 167.5292501449585
+        },
+        {
+          "step": 44,
+          "message_count": 57,
+          "total_tokens": 1065822,
+          "compressions_so_far": 2,
+          "timestamp": 170.67367506027222
+        },
+        {
+          "step": 45,
+          "message_count": 59,
+          "total_tokens": 1106484,
+          "compressions_so_far": 2,
+          "timestamp": 173.06022119522095
+        },
+        {
+          "step": 46,
+          "message_count": 61,
+          "total_tokens": 1148479,
+          "compressions_so_far": 2,
+          "timestamp": 179.55049014091492
+        },
+        {
+          "step": 47,
+          "message_count": 63,
+          "total_tokens": 1192208,
+          "compressions_so_far": 2,
+          "timestamp": 189.58585619926453
+        },
+        {
+          "step": 48,
+          "message_count": 65,
+          "total_tokens": 1236981,
+          "compressions_so_far": 2,
+          "timestamp": 197.73986101150513
+        },
+        {
+          "step": 49,
+          "message_count": 67,
+          "total_tokens": 1283168,
+          "compressions_so_far": 2,
+          "timestamp": 206.7441782951355
+        },
+        {
+          "step": 50,
+          "message_count": 69,
+          "total_tokens": 1330029,
+          "compressions_so_far": 2,
+          "timestamp": 212.41320133209229
+        },
+        {
+          "step": 51,
+          "message_count": 71,
+          "total_tokens": 1378777,
+          "compressions_so_far": 2,
+          "timestamp": 226.85336804389954
+        },
+        {
+          "step": 52,
+          "message_count": 73,
+          "total_tokens": 1428674,
+          "compressions_so_far": 2,
+          "timestamp": 228.6776032447815
+        },
+        {
+          "step": 53,
+          "message_count": 75,
+          "total_tokens": 1486190,
+          "compressions_so_far": 2,
+          "timestamp": 235.24810218811035
+        }
+      ],
+      "knowledge_entries": 2,
+      "active_focuses": 0
+    },
+    "error": null
+  },
+  {
+    "instance_id": "pylint-dev__pylint-5859",
+    "agent_type": "baseline",
+    "model": "claude-haiku-4-5-20251001",
+    "success": true,
+    "patch": "diff --git a/pylint/checkers/misc.py b/pylint/checkers/misc.py\nindex 69149e61a..28978365f 100644\n--- a/pylint/checkers/misc.py\n+++ b/pylint/checkers/misc.py\n@@ -121,9 +121,9 @@ class EncodingChecker(BaseChecker):\n \n         notes = \"|\".join(re.escape(note) for note in self.config.notes)\n         if self.config.notes_rgx:\n-            regex_string = rf\"#\\s*({notes}|{self.config.notes_rgx})\\b\"\n+            regex_string = rf\"#\\s*({notes}|{self.config.notes_rgx})(?=\\W|$)\"\n         else:\n-            regex_string = rf\"#\\s*({notes})\\b\"\n+            regex_string = rf\"#\\s*({notes})(?=\\W|$)\"\n \n         self._fixme_pattern = re.compile(regex_string, re.I)\n \ndiff --git a/tests/checkers/unittest_misc.py b/tests/checkers/unittest_misc.py\nindex 23e19a9d0..102055f07 100644\n--- a/tests/checkers/unittest_misc.py\n+++ b/tests/checkers/unittest_misc.py\n@@ -120,3 +120,45 @@ class TestFixme(CheckerTestCase):\n         \"\"\"\n         with self.assertNoMessages():\n             self.checker.process_tokens(_tokenize_str(code))\n+\n+    @set_config(notes=[\"YES\", \"???\"])\n+    def test_punctuation_only_note_tags(self) -> None:\n+        \"\"\"Test that note tags consisting entirely of punctuation are recognized.\n+        \n+        This is a regression test for the issue where note tags that are entirely\n+        punctuation (like ???) were not being recognized because the regex pattern\n+        used \\\\b (word boundary) which doesn't work with non-word characters.\n+        \"\"\"\n+        code = \"\"\"a = 1\n+                # YES: yes\n+                # ???: no\n+                \"\"\"\n+        with self.assertAddsMessages(\n+            [\n+                MessageTest(msg_id=\"fixme\", line=2, args=\"YES: yes\", col_offset=17),\n+                MessageTest(msg_id=\"fixme\", line=3, args=\"???: no\", col_offset=17),\n+            ]\n+        ):\n+            self.checker.process_tokens(_tokenize_str(code))\n+\n+    @set_config(notes=[\"???\"])\n+    def test_punctuation_only_note_tag_alone(self) -> None:\n+        \"\"\"Test that punctuation-only note tags work when used alone.\"\"\"\n+        code = \"\"\"a = 1\n+                # ???\n+                \"\"\"\n+        with self.assertAddsMessages(\n+            MessageTest(msg_id=\"fixme\", line=2, args=\"???\", col_offset=17)\n+        ):\n+            self.checker.process_tokens(_tokenize_str(code))\n+\n+    @set_config(notes=[\"!!!\"])\n+    def test_multiple_punctuation_note_tag(self) -> None:\n+        \"\"\"Test that multiple punctuation characters work as note tags.\"\"\"\n+        code = \"\"\"a = 1\n+                # !!!: important\n+                \"\"\"\n+        with self.assertAddsMessages(\n+            MessageTest(msg_id=\"fixme\", line=2, args=\"!!!: important\", col_offset=17)\n+        ):\n+            self.checker.process_tokens(_tokenize_str(code))\n",
+    "metrics": {
+      "total_input_tokens": 1328606,
+      "total_output_tokens": 23076,
+      "llm_calls": 55,
+      "tool_calls": 54,
+      "compressions": 0,
+      "messages_dropped": 0,
+      "wall_time_seconds": 229.0174651145935,
+      "message_count": 111,
+      "trajectory": [
+        {
+          "step": 0,
+          "message_count": 3,
+          "total_tokens": 1735,
+          "compressions_so_far": 0,
+          "timestamp": 1.478391170501709
+        },
+        {
+          "step": 1,
+          "message_count": 5,
+          "total_tokens": 3670,
+          "compressions_so_far": 0,
+          "timestamp": 2.7532241344451904
+        },
+        {
+          "step": 2,
+          "message_count": 7,
+          "total_tokens": 5855,
+          "compressions_so_far": 0,
+          "timestamp": 4.017970323562622
+        },
+        {
+          "step": 3,
+          "message_count": 9,
+          "total_tokens": 8360,
+          "compressions_so_far": 0,
+          "timestamp": 5.881875276565552
+        },
+        {
+          "step": 4,
+          "message_count": 11,
+          "total_tokens": 13516,
+          "compressions_so_far": 0,
+          "timestamp": 10.48936915397644
+        },
+        {
+          "step": 5,
+          "message_count": 13,
+          "total_tokens": 19192,
+          "compressions_so_far": 0,
+          "timestamp": 13.559855222702026
+        },
+        {
+          "step": 6,
+          "message_count": 15,
+          "total_tokens": 25078,
+          "compressions_so_far": 0,
+          "timestamp": 15.712998151779175
+        },
+        {
+          "step": 7,
+          "message_count": 17,
+          "total_tokens": 31369,
+          "compressions_so_far": 0,
+          "timestamp": 17.65528702735901
+        },
+        {
+          "step": 8,
+          "message_count": 19,
+          "total_tokens": 37823,
+          "compressions_so_far": 0,
+          "timestamp": 19.091495275497437
+        },
+        {
+          "step": 9,
+          "message_count": 21,
+          "total_tokens": 44420,
+          "compressions_so_far": 0,
+          "timestamp": 20.555320024490356
+        },
+        {
+          "step": 10,
+          "message_count": 23,
+          "total_tokens": 53271,
+          "compressions_so_far": 0,
+          "timestamp": 28.111709356307983
+        },
+        {
+          "step": 11,
+          "message_count": 25,
+          "total_tokens": 62963,
+          "compressions_so_far": 0,
+          "timestamp": 33.580318212509155
+        },
+        {
+          "step": 12,
+          "message_count": 27,
+          "total_tokens": 72902,
+          "compressions_so_far": 0,
+          "timestamp": 35.145315170288086
+        },
+        {
+          "step": 13,
+          "message_count": 29,
+          "total_tokens": 87476,
+          "compressions_so_far": 0,
+          "timestamp": 49.598825216293335
+        },
+        {
+          "step": 14,
+          "message_count": 31,
+          "total_tokens": 102174,
+          "compressions_so_far": 0,
+          "timestamp": 51.945709228515625
+        },
+        {
+          "step": 15,
+          "message_count": 33,
+          "total_tokens": 117023,
+          "compressions_so_far": 0,
+          "timestamp": 54.316333055496216
+        },
+        {
+          "step": 16,
+          "message_count": 35,
+          "total_tokens": 132025,
+          "compressions_so_far": 0,
+          "timestamp": 56.15730023384094
+        },
+        {
+          "step": 17,
+          "message_count": 37,
+          "total_tokens": 147345,
+          "compressions_so_far": 0,
+          "timestamp": 58.8795371055603
+        },
+        {
+          "step": 18,
+          "message_count": 39,
+          "total_tokens": 162932,
+          "compressions_so_far": 0,
+          "timestamp": 60.77031111717224
+        },
+        {
+          "step": 19,
+          "message_count": 41,
+          "total_tokens": 179397,
+          "compressions_so_far": 0,
+          "timestamp": 62.669127225875854
+        },
+        {
+          "step": 20,
+          "message_count": 43,
+          "total_tokens": 196011,
+          "compressions_so_far": 0,
+          "timestamp": 64.04178023338318
+        },
+        {
+          "step": 21,
+          "message_count": 45,
+          "total_tokens": 213228,
+          "compressions_so_far": 0,
+          "timestamp": 70.242436170578
+        },
+        {
+          "step": 22,
+          "message_count": 47,
+          "total_tokens": 230772,
+          "compressions_so_far": 0,
+          "timestamp": 71.91713833808899
+        },
+        {
+          "step": 23,
+          "message_count": 49,
+          "total_tokens": 248412,
+          "compressions_so_far": 0,
+          "timestamp": 74.07864809036255
+        },
+        {
+          "step": 24,
+          "message_count": 51,
+          "total_tokens": 266128,
+          "compressions_so_far": 0,
+          "timestamp": 75.4108190536499
+        },
+        {
+          "step": 25,
+          "message_count": 53,
+          "total_tokens": 286334,
+          "compressions_so_far": 0,
+          "timestamp": 83.49936819076538
+        },
+        {
+          "step": 26,
+          "message_count": 55,
+          "total_tokens": 307065,
+          "compressions_so_far": 0,
+          "timestamp": 85.75099325180054
+        },
+        {
+          "step": 27,
+          "message_count": 57,
+          "total_tokens": 330727,
+          "compressions_so_far": 0,
+          "timestamp": 92.06759119033813
+        },
+        {
+          "step": 28,
+          "message_count": 59,
+          "total_tokens": 355036,
+          "compressions_so_far": 0,
+          "timestamp": 95.89300513267517
+        },
+        {
+          "step": 29,
+          "message_count": 61,
+          "total_tokens": 379808,
+          "compressions_so_far": 0,
+          "timestamp": 98.85889410972595
+        },
+        {
+          "step": 30,
+          "message_count": 63,
+          "total_tokens": 405483,
+          "compressions_so_far": 0,
+          "timestamp": 104.59353017807007
+        },
+        {
+          "step": 31,
+          "message_count": 65,
+          "total_tokens": 431554,
+          "compressions_so_far": 0,
+          "timestamp": 106.33708906173706
+        },
+        {
+          "step": 32,
+          "message_count": 67,
+          "total_tokens": 461194,
+          "compressions_so_far": 0,
+          "timestamp": 117.79117321968079
+        },
+        {
+          "step": 33,
+          "message_count": 69,
+          "total_tokens": 491361,
+          "compressions_so_far": 0,
+          "timestamp": 125.27790999412537
+        },
+        {
+          "step": 34,
+          "message_count": 71,
+          "total_tokens": 522042,
+          "compressions_so_far": 0,
+          "timestamp": 129.33128023147583
+        },
+        {
+          "step": 35,
+          "message_count": 73,
+          "total_tokens": 553129,
+          "compressions_so_far": 0,
+          "timestamp": 132.54973793029785
+        },
+        {
+          "step": 36,
+          "message_count": 75,
+          "total_tokens": 584509,
+          "compressions_so_far": 0,
+          "timestamp": 134.25622415542603
+        },
+        {
+          "step": 37,
+          "message_count": 77,
+          "total_tokens": 616302,
+          "compressions_so_far": 0,
+          "timestamp": 136.086932182312
+        },
+        {
+          "step": 38,
+          "message_count": 79,
+          "total_tokens": 649932,
+          "compressions_so_far": 0,
+          "timestamp": 144.477055311203
+        },
+        {
+          "step": 39,
+          "message_count": 81,
+          "total_tokens": 683688,
+          "compressions_so_far": 0,
+          "timestamp": 146.27525115013123
+        },
+        {
+          "step": 40,
+          "message_count": 83,
+          "total_tokens": 719770,
+          "compressions_so_far": 0,
+          "timestamp": 148.82121920585632
+        },
+        {
+          "step": 41,
+          "message_count": 85,
+          "total_tokens": 759202,
+          "compressions_so_far": 0,
+          "timestamp": 158.8651282787323
+        },
+        {
+          "step": 42,
+          "message_count": 87,
+          "total_tokens": 799276,
+          "compressions_so_far": 0,
+          "timestamp": 161.64145302772522
+        },
+        {
+          "step": 43,
+          "message_count": 89,
+          "total_tokens": 841039,
+          "compressions_so_far": 0,
+          "timestamp": 169.92472314834595
+        },
+        {
+          "step": 44,
+          "message_count": 91,
+          "total_tokens": 883517,
+          "compressions_so_far": 0,
+          "timestamp": 178.30612707138062
+        },
+        {
+          "step": 45,
+          "message_count": 93,
+          "total_tokens": 926694,
+          "compressions_so_far": 0,
+          "timestamp": 180.98918223381042
+        },
+        {
+          "step": 46,
+          "message_count": 95,
+          "total_tokens": 970185,
+          "compressions_so_far": 0,
+          "timestamp": 183.9539041519165
+        },
+        {
+          "step": 47,
+          "message_count": 97,
+          "total_tokens": 1014091,
+          "compressions_so_far": 0,
+          "timestamp": 187.43441009521484
+        },
+        {
+          "step": 48,
+          "message_count": 99,
+          "total_tokens": 1059930,
+          "compressions_so_far": 0,
+          "timestamp": 198.1997721195221
+        },
+        {
+          "step": 49,
+          "message_count": 101,
+          "total_tokens": 1106486,
+          "compressions_so_far": 0,
+          "timestamp": 204.54616117477417
+        },
+        {
+          "step": 50,
+          "message_count": 103,
+          "total_tokens": 1153914,
+          "compressions_so_far": 0,
+          "timestamp": 212.0146312713623
+        },
+        {
+          "step": 51,
+          "message_count": 105,
+          "total_tokens": 1202012,
+          "compressions_so_far": 0,
+          "timestamp": 214.85123419761658
+        },
+        {
+          "step": 52,
+          "message_count": 107,
+          "total_tokens": 1250890,
+          "compressions_so_far": 0,
+          "timestamp": 219.99864435195923
+        },
+        {
+          "step": 53,
+          "message_count": 109,
+          "total_tokens": 1300543,
+          "compressions_so_far": 0,
+          "timestamp": 222.9663381576538
+        },
+        {
+          "step": 54,
+          "message_count": 111,
+          "total_tokens": 1351682,
+          "compressions_so_far": 0,
+          "timestamp": 229.01745915412903
+        }
+      ]
+    },
+    "error": null
+  },
+  {
+    "instance_id": "pylint-dev__pylint-5859",
+    "agent_type": "focus",
+    "model": "claude-haiku-4-5-20251001",
+    "success": true,
+    "patch": "diff --git a/pylint/checkers/misc.py b/pylint/checkers/misc.py\nindex 69149e61a..28978365f 100644\n--- a/pylint/checkers/misc.py\n+++ b/pylint/checkers/misc.py\n@@ -121,9 +121,9 @@ class EncodingChecker(BaseChecker):\n \n         notes = \"|\".join(re.escape(note) for note in self.config.notes)\n         if self.config.notes_rgx:\n-            regex_string = rf\"#\\s*({notes}|{self.config.notes_rgx})\\b\"\n+            regex_string = rf\"#\\s*({notes}|{self.config.notes_rgx})(?=\\W|$)\"\n         else:\n-            regex_string = rf\"#\\s*({notes})\\b\"\n+            regex_string = rf\"#\\s*({notes})(?=\\W|$)\"\n \n         self._fixme_pattern = re.compile(regex_string, re.I)\n \n",
+    "metrics": {
+      "total_input_tokens": 782691,
+      "total_output_tokens": 20184,
+      "llm_calls": 60,
+      "tool_calls": 59,
+      "compressions": 2,
+      "messages_dropped": 40,
+      "wall_time_seconds": 208.95152401924133,
+      "message_count": 81,
+      "trajectory": [
+        {
+          "step": 0,
+          "message_count": 3,
+          "total_tokens": 2457,
+          "compressions_so_far": 0,
+          "timestamp": 1.5236151218414307
+        },
+        {
+          "step": 1,
+          "message_count": 5,
+          "total_tokens": 5039,
+          "compressions_so_far": 0,
+          "timestamp": 2.6392080783843994
+        },
+        {
+          "step": 2,
+          "message_count": 7,
+          "total_tokens": 8819,
+          "compressions_so_far": 0,
+          "timestamp": 3.850001096725464
+        },
+        {
+          "step": 3,
+          "message_count": 9,
+          "total_tokens": 12697,
+          "compressions_so_far": 0,
+          "timestamp": 5.282068252563477
+        },
+        {
+          "step": 4,
+          "message_count": 11,
+          "total_tokens": 16977,
+          "compressions_so_far": 0,
+          "timestamp": 6.700042247772217
+        },
+        {
+          "step": 5,
+          "message_count": 13,
+          "total_tokens": 23751,
+          "compressions_so_far": 0,
+          "timestamp": 9.274583101272583
+        },
+        {
+          "step": 6,
+          "message_count": 15,
+          "total_tokens": 32108,
+          "compressions_so_far": 0,
+          "timestamp": 11.395300149917603
+        },
+        {
+          "step": 7,
+          "message_count": 17,
+          "total_tokens": 40900,
+          "compressions_so_far": 0,
+          "timestamp": 14.188034057617188
+        },
+        {
+          "step": 8,
+          "message_count": 19,
+          "total_tokens": 49803,
+          "compressions_so_far": 0,
+          "timestamp": 15.52118706703186
+        },
+        {
+          "step": 9,
+          "message_count": 21,
+          "total_tokens": 58862,
+          "compressions_so_far": 0,
+          "timestamp": 18.310431957244873
+        },
+        {
+          "step": 10,
+          "message_count": 23,
+          "total_tokens": 68079,
+          "compressions_so_far": 0,
+          "timestamp": 19.919456958770752
+        },
+        {
+          "step": 11,
+          "message_count": 25,
+          "total_tokens": 77465,
+          "compressions_so_far": 0,
+          "timestamp": 21.767651081085205
+        },
+        {
+          "step": 12,
+          "message_count": 27,
+          "total_tokens": 87835,
+          "compressions_so_far": 0,
+          "timestamp": 25.87645411491394
+        },
+        {
+          "step": 13,
+          "message_count": 4,
+          "total_tokens": 87835,
+          "compressions_so_far": 1,
+          "timestamp": 25.8780300617218
+        },
+        {
+          "step": 13,
+          "message_count": 6,
+          "total_tokens": 90692,
+          "compressions_so_far": 1,
+          "timestamp": 27.46574115753174
+        },
+        {
+          "step": 14,
+          "message_count": 8,
+          "total_tokens": 96107,
+          "compressions_so_far": 1,
+          "timestamp": 30.43513512611389
+        },
+        {
+          "step": 15,
+          "message_count": 10,
+          "total_tokens": 101635,
+          "compressions_so_far": 1,
+          "timestamp": 31.86006498336792
+        },
+        {
+          "step": 16,
+          "message_count": 12,
+          "total_tokens": 107320,
+          "compressions_so_far": 1,
+          "timestamp": 34.132400035858154
+        },
+        {
+          "step": 17,
+          "message_count": 14,
+          "total_tokens": 113177,
+          "compressions_so_far": 1,
+          "timestamp": 36.4744439125061
+        },
+        {
+          "step": 18,
+          "message_count": 16,
+          "total_tokens": 119841,
+          "compressions_so_far": 1,
+          "timestamp": 38.56323194503784
+        },
+        {
+          "step": 19,
+          "message_count": 18,
+          "total_tokens": 126580,
+          "compressions_so_far": 1,
+          "timestamp": 39.664278984069824
+        },
+        {
+          "step": 20,
+          "message_count": 20,
+          "total_tokens": 133888,
+          "compressions_so_far": 1,
+          "timestamp": 41.141741037368774
+        },
+        {
+          "step": 21,
+          "message_count": 22,
+          "total_tokens": 141274,
+          "compressions_so_far": 1,
+          "timestamp": 42.861977100372314
+        },
+        {
+          "step": 22,
+          "message_count": 24,
+          "total_tokens": 148798,
+          "compressions_so_far": 1,
+          "timestamp": 44.35835313796997
+        },
+        {
+          "step": 23,
+          "message_count": 26,
+          "total_tokens": 156665,
+          "compressions_so_far": 1,
+          "timestamp": 46.13850522041321
+        },
+        {
+          "step": 24,
+          "message_count": 28,
+          "total_tokens": 164677,
+          "compressions_so_far": 1,
+          "timestamp": 48.44449710845947
+        },
+        {
+          "step": 25,
+          "message_count": 30,
+          "total_tokens": 172968,
+          "compressions_so_far": 1,
+          "timestamp": 51.49845290184021
+        },
+        {
+          "step": 26,
+          "message_count": 32,
+          "total_tokens": 185930,
+          "compressions_so_far": 1,
+          "timestamp": 67.94925212860107
+        },
+        {
+          "step": 27,
+          "message_count": 34,
+          "total_tokens": 199565,
+          "compressions_so_far": 1,
+          "timestamp": 72.45299816131592
+        },
+        {
+          "step": 28,
+          "message_count": 36,
+          "total_tokens": 213337,
+          "compressions_so_far": 1,
+          "timestamp": 75.10028219223022
+        },
+        {
+          "step": 29,
+          "message_count": 38,
+          "total_tokens": 228425,
+          "compressions_so_far": 1,
+          "timestamp": 82.08212113380432
+        },
+        {
+          "step": 30,
+          "message_count": 40,
+          "total_tokens": 243652,
+          "compressions_so_far": 1,
+          "timestamp": 84.43659520149231
+        },
+        {
+          "step": 31,
+          "message_count": 42,
+          "total_tokens": 261617,
+          "compressions_so_far": 1,
+          "timestamp": 104.57045912742615
+        },
+        {
+          "step": 32,
+          "message_count": 44,
+          "total_tokens": 279682,
+          "compressions_so_far": 1,
+          "timestamp": 106.96389412879944
+        },
+        {
+          "step": 33,
+          "message_count": 46,
+          "total_tokens": 300325,
+          "compressions_so_far": 1,
+          "timestamp": 110.62551498413086
+        },
+        {
+          "step": 34,
+          "message_count": 29,
+          "total_tokens": 300325,
+          "compressions_so_far": 2,
+          "timestamp": 110.62741112709045
+        },
+        {
+          "step": 34,
+          "message_count": 31,
+          "total_tokens": 308768,
+          "compressions_so_far": 2,
+          "timestamp": 112.18795013427734
+        },
+        {
+          "step": 35,
+          "message_count": 33,
+          "total_tokens": 320377,
+          "compressions_so_far": 2,
+          "timestamp": 119.3530342578888
+        },
+        {
+          "step": 36,
+          "message_count": 35,
+          "total_tokens": 332125,
+          "compressions_so_far": 2,
+          "timestamp": 121.91405725479126
+        },
+        {
+          "step": 37,
+          "message_count": 37,
+          "total_tokens": 344284,
+          "compressions_so_far": 2,
+          "timestamp": 124.67497420310974
+        },
+        {
+          "step": 38,
+          "message_count": 39,
+          "total_tokens": 359589,
+          "compressions_so_far": 2,
+          "timestamp": 131.23373889923096
+        },
+        {
+          "step": 39,
+          "message_count": 41,
+          "total_tokens": 375031,
+          "compressions_so_far": 2,
+          "timestamp": 133.61540412902832
+        },
+        {
+          "step": 40,
+          "message_count": 43,
+          "total_tokens": 391346,
+          "compressions_so_far": 2,
+          "timestamp": 138.19717812538147
+        },
+        {
+          "step": 41,
+          "message_count": 45,
+          "total_tokens": 407800,
+          "compressions_so_far": 2,
+          "timestamp": 141.28795623779297
+        },
+        {
+          "step": 42,
+          "message_count": 47,
+          "total_tokens": 424403,
+          "compressions_so_far": 2,
+          "timestamp": 142.9040071964264
+        },
+        {
+          "step": 43,
+          "message_count": 49,
+          "total_tokens": 441155,
+          "compressions_so_far": 2,
+          "timestamp": 145.10195112228394
+        },
+        {
+          "step": 44,
+          "message_count": 51,
+          "total_tokens": 457996,
+          "compressions_so_far": 2,
+          "timestamp": 147.4095242023468
+        },
+        {
+          "step": 45,
+          "message_count": 53,
+          "total_tokens": 476089,
+          "compressions_so_far": 2,
+          "timestamp": 152.51093816757202
+        },
+        {
+          "step": 46,
+          "message_count": 55,
+          "total_tokens": 494321,
+          "compressions_so_far": 2,
+          "timestamp": 154.6764509677887
+        },
+        {
+          "step": 47,
+          "message_count": 57,
+          "total_tokens": 513837,
+          "compressions_so_far": 2,
+          "timestamp": 163.0332489013672
+        },
+        {
+          "step": 48,
+          "message_count": 59,
+          "total_tokens": 533476,
+          "compressions_so_far": 2,
+          "timestamp": 164.70264530181885
+        },
+        {
+          "step": 49,
+          "message_count": 61,
+          "total_tokens": 553224,
+          "compressions_so_far": 2,
+          "timestamp": 166.66017198562622
+        },
+        {
+          "step": 50,
+          "message_count": 63,
+          "total_tokens": 573057,
+          "compressions_so_far": 2,
+          "timestamp": 168.09401106834412
+        },
+        {
+          "step": 51,
+          "message_count": 65,
+          "total_tokens": 596506,
+          "compressions_so_far": 2,
+          "timestamp": 176.78513717651367
+        },
+        {
+          "step": 52,
+          "message_count": 67,
+          "total_tokens": 620088,
+          "compressions_so_far": 2,
+          "timestamp": 179.051589012146
+        },
+        {
+          "step": 53,
+          "message_count": 69,
+          "total_tokens": 644566,
+          "compressions_so_far": 2,
+          "timestamp": 182.53210520744324
+        },
+        {
+          "step": 54,
+          "message_count": 71,
+          "total_tokens": 669931,
+          "compressions_so_far": 2,
+          "timestamp": 189.59815502166748
+        },
+        {
+          "step": 55,
+          "message_count": 73,
+          "total_tokens": 695462,
+          "compressions_so_far": 2,
+          "timestamp": 192.16195917129517
+        },
+        {
+          "step": 56,
+          "message_count": 75,
+          "total_tokens": 721863,
+          "compressions_so_far": 2,
+          "timestamp": 198.30206727981567
+        },
+        {
+          "step": 57,
+          "message_count": 77,
+          "total_tokens": 748397,
+          "compressions_so_far": 2,
+          "timestamp": 200.15649724006653
+        },
+        {
+          "step": 58,
+          "message_count": 79,
+          "total_tokens": 775240,
+          "compressions_so_far": 2,
+          "timestamp": 201.88692903518677
+        },
+        {
+          "step": 59,
+          "message_count": 81,
+          "total_tokens": 802875,
+          "compressions_so_far": 2,
+          "timestamp": 208.9515221118927
+        }
+      ],
+      "knowledge_entries": 2,
+      "active_focuses": 0
+    },
+    "error": null
+  },
+  {
+    "instance_id": "scikit-learn__scikit-learn-10297",
+    "agent_type": "baseline",
+    "model": "claude-haiku-4-5-20251001",
+    "success": true,
+    "patch": "diff --git a/sklearn/linear_model/ridge.py b/sklearn/linear_model/ridge.py\nindex 911c74ae3b..6469cdbcfc 100644\n--- a/sklearn/linear_model/ridge.py\n+++ b/sklearn/linear_model/ridge.py\n@@ -1301,6 +1301,12 @@ class RidgeClassifierCV(LinearClassifierMixin, _BaseRidgeCV):\n         weights inversely proportional to class frequencies in the input data\n         as ``n_samples / (n_classes * np.bincount(y))``\n \n+    store_cv_values : boolean, default=False\n+        Flag indicating if the cross-validation values corresponding to\n+        each alpha should be stored in the `cv_values_` attribute (see\n+        below). This flag is only compatible with `cv=None` (i.e. using\n+        Generalized Cross-Validation).\n+\n     Attributes\n     ----------\n     cv_values_ : array, shape = [n_samples, n_alphas] or \\\n@@ -1333,10 +1339,11 @@ class RidgeClassifierCV(LinearClassifierMixin, _BaseRidgeCV):\n     advantage of the multi-variate response support in Ridge.\n     \"\"\"\n     def __init__(self, alphas=(0.1, 1.0, 10.0), fit_intercept=True,\n-                 normalize=False, scoring=None, cv=None, class_weight=None):\n+                 normalize=False, scoring=None, cv=None, class_weight=None,\n+                 store_cv_values=False):\n         super(RidgeClassifierCV, self).__init__(\n             alphas=alphas, fit_intercept=fit_intercept, normalize=normalize,\n-            scoring=scoring, cv=cv)\n+            scoring=scoring, cv=cv, store_cv_values=store_cv_values)\n         self.class_weight = class_weight\n \n     def fit(self, X, y, sample_weight=None):\ndiff --git a/sklearn/linear_model/tests/test_ridge.py b/sklearn/linear_model/tests/test_ridge.py\nindex ee44da5d56..5c943190d0 100644\n--- a/sklearn/linear_model/tests/test_ridge.py\n+++ b/sklearn/linear_model/tests/test_ridge.py\n@@ -860,3 +860,19 @@ def test_dtype_match_cholesky():\n     assert ridge_32.predict(X_32).dtype == X_32.dtype\n     assert ridge_64.predict(X_64).dtype == X_64.dtype\n     assert_almost_equal(ridge_32.coef_, ridge_64.coef_, decimal=5)\n+\n+\n+def test_ridge_classifier_cv_store_cv_values():\n+    # Test RidgeClassifierCV's store_cv_values attribute.\n+    rng = np.random.RandomState(42)\n+\n+    n_samples = 8\n+    n_features = 5\n+    x = rng.randn(n_samples, n_features)\n+    y = rng.randint(0, 2, n_samples)\n+    alphas = [1e-1, 1e0, 1e1]\n+    n_alphas = len(alphas)\n+\n+    r = RidgeClassifierCV(alphas=alphas, store_cv_values=True)\n+    r.fit(x, y)\n+    assert_equal(r.cv_values_.shape, (n_samples, n_alphas))\n",
+    "metrics": {
+      "total_input_tokens": 2804715,
+      "total_output_tokens": 13866,
+      "llm_calls": 39,
+      "tool_calls": 38,
+      "compressions": 0,
+      "messages_dropped": 0,
+      "wall_time_seconds": 168.50003695487976,
+      "message_count": 79,
+      "trajectory": [
+        {
+          "step": 0,
+          "message_count": 3,
+          "total_tokens": 1945,
+          "compressions_so_far": 0,
+          "timestamp": 2.93843412399292
+        },
+        {
+          "step": 1,
+          "message_count": 5,
+          "total_tokens": 5338,
+          "compressions_so_far": 0,
+          "timestamp": 4.505635023117065
+        },
+        {
+          "step": 2,
+          "message_count": 7,
+          "total_tokens": 9019,
+          "compressions_so_far": 0,
+          "timestamp": 6.110729932785034
+        },
+        {
+          "step": 3,
+          "message_count": 9,
+          "total_tokens": 28488,
+          "compressions_so_far": 0,
+          "timestamp": 7.938445091247559
+        },
+        {
+          "step": 4,
+          "message_count": 11,
+          "total_tokens": 58640,
+          "compressions_so_far": 0,
+          "timestamp": 11.523818016052246
+        },
+        {
+          "step": 5,
+          "message_count": 13,
+          "total_tokens": 88922,
+          "compressions_so_far": 0,
+          "timestamp": 13.796050071716309
+        },
+        {
+          "step": 6,
+          "message_count": 15,
+          "total_tokens": 138926,
+          "compressions_so_far": 0,
+          "timestamp": 46.339807987213135
+        },
+        {
+          "step": 7,
+          "message_count": 17,
+          "total_tokens": 185077,
+          "compressions_so_far": 0,
+          "timestamp": 48.18419694900513
+        },
+        {
+          "step": 8,
+          "message_count": 19,
+          "total_tokens": 231361,
+          "compressions_so_far": 0,
+          "timestamp": 50.74118900299072
+        },
+        {
+          "step": 9,
+          "message_count": 21,
+          "total_tokens": 277741,
+          "compressions_so_far": 0,
+          "timestamp": 52.48238396644592
+        },
+        {
+          "step": 10,
+          "message_count": 23,
+          "total_tokens": 339912,
+          "compressions_so_far": 0,
+          "timestamp": 56.88424897193909
+        },
+        {
+          "step": 11,
+          "message_count": 25,
+          "total_tokens": 402211,
+          "compressions_so_far": 0,
+          "timestamp": 58.796298027038574
+        },
+        {
+          "step": 12,
+          "message_count": 27,
+          "total_tokens": 480689,
+          "compressions_so_far": 0,
+          "timestamp": 63.409245014190674
+        },
+        {
+          "step": 13,
+          "message_count": 29,
+          "total_tokens": 559282,
+          "compressions_so_far": 0,
+          "timestamp": 65.5506329536438
+        },
+        {
+          "step": 14,
+          "message_count": 31,
+          "total_tokens": 638037,
+          "compressions_so_far": 0,
+          "timestamp": 70.69397783279419
+        },
+        {
+          "step": 15,
+          "message_count": 33,
+          "total_tokens": 716960,
+          "compressions_so_far": 0,
+          "timestamp": 73.58008193969727
+        },
+        {
+          "step": 16,
+          "message_count": 35,
+          "total_tokens": 796344,
+          "compressions_so_far": 0,
+          "timestamp": 75.76303911209106
+        },
+        {
+          "step": 17,
+          "message_count": 37,
+          "total_tokens": 876121,
+          "compressions_so_far": 0,
+          "timestamp": 78.38758397102356
+        },
+        {
+          "step": 18,
+          "message_count": 39,
+          "total_tokens": 957209,
+          "compressions_so_far": 0,
+          "timestamp": 82.82825493812561
+        },
+        {
+          "step": 19,
+          "message_count": 41,
+          "total_tokens": 1038969,
+          "compressions_so_far": 0,
+          "timestamp": 89.13962984085083
+        },
+        {
+          "step": 20,
+          "message_count": 43,
+          "total_tokens": 1121064,
+          "compressions_so_far": 0,
+          "timestamp": 92.24424600601196
+        },
+        {
+          "step": 21,
+          "message_count": 45,
+          "total_tokens": 1203496,
+          "compressions_so_far": 0,
+          "timestamp": 96.41526103019714
+        },
+        {
+          "step": 22,
+          "message_count": 47,
+          "total_tokens": 1286107,
+          "compressions_so_far": 0,
+          "timestamp": 100.55973100662231
+        },
+        {
+          "step": 23,
+          "message_count": 49,
+          "total_tokens": 1369871,
+          "compressions_so_far": 0,
+          "timestamp": 103.17967200279236
+        },
+        {
+          "step": 24,
+          "message_count": 51,
+          "total_tokens": 1455326,
+          "compressions_so_far": 0,
+          "timestamp": 113.75032305717468
+        },
+        {
+          "step": 25,
+          "message_count": 53,
+          "total_tokens": 1541793,
+          "compressions_so_far": 0,
+          "timestamp": 119.3491678237915
+        },
+        {
+          "step": 26,
+          "message_count": 55,
+          "total_tokens": 1628363,
+          "compressions_so_far": 0,
+          "timestamp": 121.60198879241943
+        },
+        {
+          "step": 27,
+          "message_count": 57,
+          "total_tokens": 1725811,
+          "compressions_so_far": 0,
+          "timestamp": 127.84611010551453
+        },
+        {
+          "step": 28,
+          "message_count": 59,
+          "total_tokens": 1823418,
+          "compressions_so_far": 0,
+          "timestamp": 131.4314570426941
+        },
+        {
+          "step": 29,
+          "message_count": 61,
+          "total_tokens": 1921432,
+          "compressions_so_far": 0,
+          "timestamp": 134.34163308143616
+        },
+        {
+          "step": 30,
+          "message_count": 63,
+          "total_tokens": 2020330,
+          "compressions_so_far": 0,
+          "timestamp": 139.01891994476318
+        },
+        {
+          "step": 31,
+          "message_count": 65,
+          "total_tokens": 2119374,
+          "compressions_so_far": 0,
+          "timestamp": 142.22496008872986
+        },
+        {
+          "step": 32,
+          "message_count": 67,
+          "total_tokens": 2218567,
+          "compressions_so_far": 0,
+          "timestamp": 145.97199487686157
+        },
+        {
+          "step": 33,
+          "message_count": 69,
+          "total_tokens": 2317983,
+          "compressions_so_far": 0,
+          "timestamp": 148.89804911613464
+        },
+        {
+          "step": 34,
+          "message_count": 71,
+          "total_tokens": 2417573,
+          "compressions_so_far": 0,
+          "timestamp": 152.01731204986572
+        },
+        {
+          "step": 35,
+          "message_count": 73,
+          "total_tokens": 2517412,
+          "compressions_so_far": 0,
+          "timestamp": 154.92715501785278
+        },
+        {
+          "step": 36,
+          "message_count": 75,
+          "total_tokens": 2617409,
+          "compressions_so_far": 0,
+          "timestamp": 158.14494395256042
+        },
+        {
+          "step": 37,
+          "message_count": 77,
+          "total_tokens": 2717625,
+          "compressions_so_far": 0,
+          "timestamp": 161.53570103645325
+        },
+        {
+          "step": 38,
+          "message_count": 79,
+          "total_tokens": 2818581,
+          "compressions_so_far": 0,
+          "timestamp": 168.5000340938568
+        }
+      ]
+    },
+    "error": null
+  },
+  {
+    "instance_id": "scikit-learn__scikit-learn-10297",
+    "agent_type": "focus",
+    "model": "claude-haiku-4-5-20251001",
+    "success": true,
+    "patch": "diff --git a/sklearn/linear_model/ridge.py b/sklearn/linear_model/ridge.py\nindex 911c74ae3b..6469cdbcfc 100644\n--- a/sklearn/linear_model/ridge.py\n+++ b/sklearn/linear_model/ridge.py\n@@ -1301,6 +1301,12 @@ class RidgeClassifierCV(LinearClassifierMixin, _BaseRidgeCV):\n         weights inversely proportional to class frequencies in the input data\n         as ``n_samples / (n_classes * np.bincount(y))``\n \n+    store_cv_values : boolean, default=False\n+        Flag indicating if the cross-validation values corresponding to\n+        each alpha should be stored in the `cv_values_` attribute (see\n+        below). This flag is only compatible with `cv=None` (i.e. using\n+        Generalized Cross-Validation).\n+\n     Attributes\n     ----------\n     cv_values_ : array, shape = [n_samples, n_alphas] or \\\n@@ -1333,10 +1339,11 @@ class RidgeClassifierCV(LinearClassifierMixin, _BaseRidgeCV):\n     advantage of the multi-variate response support in Ridge.\n     \"\"\"\n     def __init__(self, alphas=(0.1, 1.0, 10.0), fit_intercept=True,\n-                 normalize=False, scoring=None, cv=None, class_weight=None):\n+                 normalize=False, scoring=None, cv=None, class_weight=None,\n+                 store_cv_values=False):\n         super(RidgeClassifierCV, self).__init__(\n             alphas=alphas, fit_intercept=fit_intercept, normalize=normalize,\n-            scoring=scoring, cv=cv)\n+            scoring=scoring, cv=cv, store_cv_values=store_cv_values)\n         self.class_weight = class_weight\n \n     def fit(self, X, y, sample_weight=None):\ndiff --git a/sklearn/linear_model/tests/test_ridge.py b/sklearn/linear_model/tests/test_ridge.py\nindex ee44da5d56..9124dec067 100644\n--- a/sklearn/linear_model/tests/test_ridge.py\n+++ b/sklearn/linear_model/tests/test_ridge.py\n@@ -598,6 +598,24 @@ def test_ridgecv_store_cv_values():\n     assert_equal(r.cv_values_.shape, (n_samples, n_responses, n_alphas))\n \n \n+\n+\n+def test_ridgeclassifiercv_store_cv_values():\n+    # Test RidgeClassifierCV's store_cv_values attribute.\n+    rng = np.random.RandomState(42)\n+\n+    n_samples = 8\n+    n_features = 5\n+    x = rng.randn(n_samples, n_features)\n+    y = np.array([0, 0, 1, 1, 0, 1, 1, 0])\n+    alphas = [1e-1, 1e0, 1e1]\n+    n_alphas = len(alphas)\n+\n+    r = RidgeClassifierCV(alphas=alphas, store_cv_values=True)\n+    r.fit(x, y)\n+    assert_equal(r.cv_values_.shape, (n_samples, n_alphas))\n+\n+\n def test_ridgecv_sample_weight():\n     rng = np.random.RandomState(0)\n     alphas = (0.1, 1.0, 10.0)\n",
+    "metrics": {
+      "total_input_tokens": 3762364,
+      "total_output_tokens": 21626,
+      "llm_calls": 63,
+      "tool_calls": 62,
+      "compressions": 3,
+      "messages_dropped": 67,
+      "wall_time_seconds": 244.73310804367065,
+      "message_count": 60,
+      "trajectory": [
+        {
+          "step": 0,
+          "message_count": 3,
+          "total_tokens": 2669,
+          "compressions_so_far": 0,
+          "timestamp": 1.6455090045928955
+        },
+        {
+          "step": 1,
+          "message_count": 5,
+          "total_tokens": 5466,
+          "compressions_so_far": 0,
+          "timestamp": 2.811570882797241
+        },
+        {
+          "step": 2,
+          "message_count": 7,
+          "total_tokens": 9400,
+          "compressions_so_far": 0,
+          "timestamp": 4.396566152572632
+        },
+        {
+          "step": 3,
+          "message_count": 9,
+          "total_tokens": 13829,
+          "compressions_so_far": 0,
+          "timestamp": 5.599010944366455
+        },
+        {
+          "step": 4,
+          "message_count": 11,
+          "total_tokens": 33989,
+          "compressions_so_far": 0,
+          "timestamp": 7.114179849624634
+        },
+        {
+          "step": 5,
+          "message_count": 13,
+          "total_tokens": 64869,
+          "compressions_so_far": 0,
+          "timestamp": 11.311681985855103
+        },
+        {
+          "step": 6,
+          "message_count": 4,
+          "total_tokens": 64869,
+          "compressions_so_far": 1,
+          "timestamp": 11.312172889709473
+        },
+        {
+          "step": 6,
+          "message_count": 6,
+          "total_tokens": 68032,
+          "compressions_so_far": 1,
+          "timestamp": 12.861186027526855
+        },
+        {
+          "step": 7,
+          "message_count": 8,
+          "total_tokens": 87040,
+          "compressions_so_far": 1,
+          "timestamp": 15.641739130020142
+        },
+        {
+          "step": 8,
+          "message_count": 10,
+          "total_tokens": 106138,
+          "compressions_so_far": 1,
+          "timestamp": 16.838814973831177
+        },
+        {
+          "step": 9,
+          "message_count": 12,
+          "total_tokens": 135836,
+          "compressions_so_far": 1,
+          "timestamp": 19.292357921600342
+        },
+        {
+          "step": 10,
+          "message_count": 14,
+          "total_tokens": 165714,
+          "compressions_so_far": 1,
+          "timestamp": 21.037518978118896
+        },
+        {
+          "step": 11,
+          "message_count": 16,
+          "total_tokens": 215314,
+          "compressions_so_far": 1,
+          "timestamp": 53.39713382720947
+        },
+        {
+          "step": 12,
+          "message_count": 18,
+          "total_tokens": 261032,
+          "compressions_so_far": 1,
+          "timestamp": 55.321452140808105
+        },
+        {
+          "step": 13,
+          "message_count": 20,
+          "total_tokens": 306877,
+          "compressions_so_far": 1,
+          "timestamp": 57.937973976135254
+        },
+        {
+          "step": 14,
+          "message_count": 22,
+          "total_tokens": 352934,
+          "compressions_so_far": 1,
+          "timestamp": 59.95044994354248
+        },
+        {
+          "step": 15,
+          "message_count": 24,
+          "total_tokens": 399087,
+          "compressions_so_far": 1,
+          "timestamp": 61.896320104599
+        },
+        {
+          "step": 16,
+          "message_count": 26,
+          "total_tokens": 461016,
+          "compressions_so_far": 1,
+          "timestamp": 64.14762997627258
+        },
+        {
+          "step": 17,
+          "message_count": 28,
+          "total_tokens": 523505,
+          "compressions_so_far": 1,
+          "timestamp": 68.7877688407898
+        },
+        {
+          "step": 18,
+          "message_count": 30,
+          "total_tokens": 586110,
+          "compressions_so_far": 1,
+          "timestamp": 70.62777996063232
+        },
+        {
+          "step": 19,
+          "message_count": 32,
+          "total_tokens": 648872,
+          "compressions_so_far": 1,
+          "timestamp": 74.40714883804321
+        },
+        {
+          "step": 20,
+          "message_count": 34,
+          "total_tokens": 712012,
+          "compressions_so_far": 1,
+          "timestamp": 76.62443399429321
+        },
+        {
+          "step": 21,
+          "message_count": 36,
+          "total_tokens": 775455,
+          "compressions_so_far": 1,
+          "timestamp": 78.6123960018158
+        },
+        {
+          "step": 22,
+          "message_count": 38,
+          "total_tokens": 840427,
+          "compressions_so_far": 1,
+          "timestamp": 85.82683491706848
+        },
+        {
+          "step": 23,
+          "message_count": 40,
+          "total_tokens": 905986,
+          "compressions_so_far": 1,
+          "timestamp": 90.53274512290955
+        },
+        {
+          "step": 24,
+          "message_count": 42,
+          "total_tokens": 971723,
+          "compressions_so_far": 1,
+          "timestamp": 94.6261100769043
+        },
+        {
+          "step": 25,
+          "message_count": 44,
+          "total_tokens": 1037645,
+          "compressions_so_far": 1,
+          "timestamp": 97.34472894668579
+        },
+        {
+          "step": 26,
+          "message_count": 46,
+          "total_tokens": 1104725,
+          "compressions_so_far": 1,
+          "timestamp": 100.66533899307251
+        },
+        {
+          "step": 27,
+          "message_count": 48,
+          "total_tokens": 1173200,
+          "compressions_so_far": 1,
+          "timestamp": 109.77625513076782
+        },
+        {
+          "step": 28,
+          "message_count": 50,
+          "total_tokens": 1242496,
+          "compressions_so_far": 1,
+          "timestamp": 114.17815899848938
+        },
+        {
+          "step": 29,
+          "message_count": 52,
+          "total_tokens": 1312617,
+          "compressions_so_far": 1,
+          "timestamp": 118.78493905067444
+        },
+        {
+          "step": 30,
+          "message_count": 54,
+          "total_tokens": 1383338,
+          "compressions_so_far": 1,
+          "timestamp": 122.88065791130066
+        },
+        {
+          "step": 31,
+          "message_count": 56,
+          "total_tokens": 1454405,
+          "compressions_so_far": 1,
+          "timestamp": 127.69278812408447
+        },
+        {
+          "step": 32,
+          "message_count": 58,
+          "total_tokens": 1525635,
+          "compressions_so_far": 1,
+          "timestamp": 130.7623770236969
+        },
+        {
+          "step": 33,
+          "message_count": 60,
+          "total_tokens": 1597101,
+          "compressions_so_far": 1,
+          "timestamp": 133.5292570590973
+        },
+        {
+          "step": 34,
+          "message_count": 62,
+          "total_tokens": 1669568,
+          "compressions_so_far": 1,
+          "timestamp": 136.09111618995667
+        },
+        {
+          "step": 35,
+          "message_count": 64,
+          "total_tokens": 1742352,
+          "compressions_so_far": 1,
+          "timestamp": 138.34713506698608
+        },
+        {
+          "step": 36,
+          "message_count": 66,
+          "total_tokens": 1815691,
+          "compressions_so_far": 1,
+          "timestamp": 140.9018759727478
+        },
+        {
+          "step": 37,
+          "message_count": 68,
+          "total_tokens": 1889200,
+          "compressions_so_far": 1,
+          "timestamp": 144.79291915893555
+        },
+        {
+          "step": 38,
+          "message_count": 70,
+          "total_tokens": 1963342,
+          "compressions_so_far": 1,
+          "timestamp": 150.2192440032959
+        },
+        {
+          "step": 39,
+          "message_count": 13,
+          "total_tokens": 1963342,
+          "compressions_so_far": 2,
+          "timestamp": 150.22045493125916
+        },
+        {
+          "step": 39,
+          "message_count": 15,
+          "total_tokens": 1993619,
+          "compressions_so_far": 2,
+          "timestamp": 152.06293296813965
+        },
+        {
+          "step": 40,
+          "message_count": 17,
+          "total_tokens": 2039796,
+          "compressions_so_far": 2,
+          "timestamp": 154.521075963974
+        },
+        {
+          "step": 41,
+          "message_count": 19,
+          "total_tokens": 2096905,
+          "compressions_so_far": 2,
+          "timestamp": 158.85601687431335
+        },
+        {
+          "step": 42,
+          "message_count": 21,
+          "total_tokens": 2154328,
+          "compressions_so_far": 2,
+          "timestamp": 161.79222893714905
+        },
+        {
+          "step": 43,
+          "message_count": 23,
+          "total_tokens": 2211909,
+          "compressions_so_far": 2,
+          "timestamp": 163.83811593055725
+        },
+        {
+          "step": 44,
+          "message_count": 25,
+          "total_tokens": 2269571,
+          "compressions_so_far": 2,
+          "timestamp": 165.57876586914062
+        },
+        {
+          "step": 45,
+          "message_count": 27,
+          "total_tokens": 2327522,
+          "compressions_so_far": 2,
+          "timestamp": 167.56397795677185
+        },
+        {
+          "step": 46,
+          "message_count": 29,
+          "total_tokens": 2386529,
+          "compressions_so_far": 2,
+          "timestamp": 171.13024377822876
+        },
+        {
+          "step": 47,
+          "message_count": 31,
+          "total_tokens": 2446237,
+          "compressions_so_far": 2,
+          "timestamp": 174.07786083221436
+        },
+        {
+          "step": 48,
+          "message_count": 33,
+          "total_tokens": 2522814,
+          "compressions_so_far": 2,
+          "timestamp": 181.5580539703369
+        },
+        {
+          "step": 49,
+          "message_count": 35,
+          "total_tokens": 2599782,
+          "compressions_so_far": 2,
+          "timestamp": 186.4716670513153
+        },
+        {
+          "step": 50,
+          "message_count": 37,
+          "total_tokens": 2676929,
+          "compressions_so_far": 2,
+          "timestamp": 188.82309889793396
+        },
+        {
+          "step": 51,
+          "message_count": 39,
+          "total_tokens": 2754825,
+          "compressions_so_far": 2,
+          "timestamp": 192.37669682502747
+        },
+        {
+          "step": 52,
+          "message_count": 41,
+          "total_tokens": 2832839,
+          "compressions_so_far": 2,
+          "timestamp": 195.27421283721924
+        },
+        {
+          "step": 53,
+          "message_count": 43,
+          "total_tokens": 2910974,
+          "compressions_so_far": 2,
+          "timestamp": 198.14609479904175
+        },
+        {
+          "step": 54,
+          "message_count": 45,
+          "total_tokens": 3006228,
+          "compressions_so_far": 2,
+          "timestamp": 207.8704149723053
+        },
+        {
+          "step": 55,
+          "message_count": 47,
+          "total_tokens": 3101606,
+          "compressions_so_far": 2,
+          "timestamp": 210.4612638950348
+        },
+        {
+          "step": 56,
+          "message_count": 49,
+          "total_tokens": 3197248,
+          "compressions_so_far": 2,
+          "timestamp": 213.50154495239258
+        },
+        {
+          "step": 57,
+          "message_count": 51,
+          "total_tokens": 3294124,
+          "compressions_so_far": 2,
+          "timestamp": 222.30760407447815
+        },
+        {
+          "step": 58,
+          "message_count": 53,
+          "total_tokens": 3391438,
+          "compressions_so_far": 2,
+          "timestamp": 227.01832509040833
+        },
+        {
+          "step": 59,
+          "message_count": 55,
+          "total_tokens": 3488885,
+          "compressions_so_far": 2,
+          "timestamp": 230.46921300888062
+        },
+        {
+          "step": 60,
+          "message_count": 57,
+          "total_tokens": 3586753,
+          "compressions_so_far": 2,
+          "timestamp": 234.28844690322876
+        },
+        {
+          "step": 61,
+          "message_count": 56,
+          "total_tokens": 3586753,
+          "compressions_so_far": 3,
+          "timestamp": 234.2892827987671
+        },
+        {
+          "step": 61,
+          "message_count": 58,
+          "total_tokens": 3685018,
+          "compressions_so_far": 3,
+          "timestamp": 238.4166281223297
+        },
+        {
+          "step": 62,
+          "message_count": 60,
+          "total_tokens": 3783990,
+          "compressions_so_far": 3,
+          "timestamp": 244.73310589790344
+        }
+      ],
+      "knowledge_entries": 3,
+      "active_focuses": 0
+    },
+    "error": null
+  }
+]

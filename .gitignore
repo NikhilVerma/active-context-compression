@@ -1,31 +1,62 @@
-# Byte-compiled / optimized / DLL files
+# Secrets and credentials
+.env
+.env.local
+*.key
+credentials.json
+
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
-
-# Distribution / packaging
-dist/
-build/
-*.egg-info/
-
-# Virtual environments
+*.so
+.Python
 .venv/
 venv/
+ENV/
 env/
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs
+*.log
+experiment_log.txt
+
+# Docker evaluation logs (large)
+logs/run_evaluation/
 
 # IDE
 .vscode/
 .idea/
+*.sublime-*
 
-# Results (keep structure but not data)
+# OS
+.DS_Store
+Thumbs.db
+*~
+.swp
+.swo
+
+# Temporary
+*.tmp
+*.bak
+
+# Keep only final experiment results, ignore intermediate
 results/*.json
+!results/final_experiment_20260110_132709.json
+!results/predictions_baseline_20260110_132709.json
+!results/predictions_focus_20260110_132709.json
+results/*.png
+!results/final_experiment_20260110_132709_sawtooth.png
+
+# Keep Docker evaluation reports
+!claude-haiku-4-5-20251001_*.json
 
 # Temporary workspaces
 /tmp/benchmark_*/
+tmp*/
 
-# Environment
-.env
-.env.local
-
-# macOS
-.DS_Store
+# Build
+dist/
+build/
