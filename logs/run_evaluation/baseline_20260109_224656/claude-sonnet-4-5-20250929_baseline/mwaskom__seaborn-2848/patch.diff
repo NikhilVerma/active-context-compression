@@ -1,0 +1,39 @@
+diff --git a/seaborn/axisgrid.py b/seaborn/axisgrid.py
+index 8526f44b..51887a24 100644
+--- a/seaborn/axisgrid.py
++++ b/seaborn/axisgrid.py
+@@ -1467,6 +1467,16 @@ class PairGrid(Grid):
+             plot_kwargs.setdefault("hue", hue)
+             plot_kwargs.setdefault("hue_order", self._hue_order)
+             plot_kwargs.setdefault("palette", self._orig_palette)
++            
++            # Filter data to only include hue values in hue_order
++            # This is necessary when hue_order is a subset of actual hue values
++            if hue is not None and self._hue_order is not None:
++                # Only keep rows where hue value is in hue_order
++                hue_mask = hue.isin(self._hue_order)
++                vector = vector[hue_mask]
++                if "hue" in plot_kwargs and plot_kwargs["hue"] is not None:
++                    plot_kwargs["hue"] = plot_kwargs["hue"][hue_mask]
++            
+             func(x=vector, **plot_kwargs)
+             ax.legend_ = None
+ 
+@@ -1569,6 +1579,17 @@ class PairGrid(Grid):
+             kwargs.update({
+                 "hue": hue, "hue_order": self._hue_order, "palette": self._orig_palette,
+             })
++        
++        # Filter data to only include hue values in hue_order
++        # This is necessary when hue_order is a subset of actual hue values
++        if self._hue_var is not None and self._hue_order is not None:
++            # Only keep rows where hue value is in hue_order
++            hue_mask = hue.isin(self._hue_order)
++            x = x[hue_mask]
++            y = y[hue_mask]
++            if "hue" in kwargs and kwargs["hue"] is not None:
++                kwargs["hue"] = kwargs["hue"][hue_mask]
++        
+         func(x=x, y=y, **kwargs)
+ 
+         self._update_legend_data(ax)

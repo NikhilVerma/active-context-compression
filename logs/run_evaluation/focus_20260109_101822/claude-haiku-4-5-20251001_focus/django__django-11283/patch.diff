@@ -1,0 +1,206 @@
+diff --git a/django/contrib/auth/migrations/0011_update_proxy_permissions.py b/django/contrib/auth/migrations/0011_update_proxy_permissions.py
+index 0e66649695..93c29c541e 100644
+--- a/django/contrib/auth/migrations/0011_update_proxy_permissions.py
++++ b/django/contrib/auth/migrations/0011_update_proxy_permissions.py
+@@ -24,6 +24,23 @@ def update_proxy_model_permissions(apps, schema_editor, reverse=False):
+         proxy_content_type = ContentType.objects.get_for_model(Model, for_concrete_model=False)
+         old_content_type = proxy_content_type if reverse else concrete_content_type
+         new_content_type = concrete_content_type if reverse else proxy_content_type
++        
++        # Get the permissions to update
++        permissions_to_update = Permission.objects.filter(
++            permissions_query,
++            content_type=old_content_type,
++        )
++        
++        # For each permission to update, check if a permission with the same
++        # codename already exists for the new content_type. If it does, delete it.
++        for permission in permissions_to_update:
++            # Delete any existing permission with the same codename for the new content_type
++            Permission.objects.filter(
++                content_type=new_content_type,
++                codename=permission.codename,
++            ).delete()
++        
++        # Now update the permissions
+         Permission.objects.filter(
+             permissions_query,
+             content_type=old_content_type,
+diff --git a/tests/auth_tests/test_migrations.py b/tests/auth_tests/test_migrations.py
+index 5ff2f6b4b3..2ab0875263 100644
+--- a/tests/auth_tests/test_migrations.py
++++ b/tests/auth_tests/test_migrations.py
+@@ -152,3 +152,173 @@ class ProxyModelWithSameAppLabelTests(TestCase):
+         user = User._default_manager.get(pk=user.pk)
+         for permission in [self.default_permission, self.custom_permission]:
+             self.assertTrue(user.has_perm('auth_tests.' + permission.codename))
++
++
++class ProxyModelPermissionsWithDuplicateTests(TestCase):
++    """
++    Test the case where a permission with the same codename already exists
++    for the proxy model's content_type. This can happen when a regular model
++    is deleted and then a proxy model with the same name is created.
++    
++    This reproduces the issue described in Django ticket #11283:
++    - Start on Django <2.2
++    - Create a model called 'TestModel'
++    - Migrate
++    - Delete the model called 'TestModel'
++    - Add a new proxy model called 'TestModel'
++    - Migrate
++    - Update to Django >=2.2
++    - Migrate (this is where the IntegrityError occurred)
++    """
++    available_apps = [
++        'auth_tests',
++        'django.contrib.auth',
++        'django.contrib.contenttypes',
++    ]
++
++    def setUp(self):
++        """
++        Create a scenario where:
++        1. A permission exists with the concrete model's content_type
++        2. A permission with the same codename already exists with the proxy model's content_type
++        This simulates the case where a regular model was deleted and a proxy model was created.
++        """
++        Permission.objects.all().delete()
++        self.concrete_content_type = ContentType.objects.get_for_model(Proxy)
++        self.proxy_content_type = ContentType.objects.get_for_model(Proxy, for_concrete_model=False)
++        
++        # Create a permission with the concrete model's content_type
++        self.permission_with_concrete = Permission.objects.create(
++            content_type=self.concrete_content_type,
++            codename='add_proxy',
++            name='Can add proxy',
++        )
++        
++        # Create a permission with the same codename but with the proxy model's content_type
++        # This simulates the case where the permission was already created for the proxy model
++        self.permission_with_proxy = Permission.objects.create(
++            content_type=self.proxy_content_type,
++            codename='add_proxy',
++            name='Can add proxy',
++        )
++
++    def test_migration_handles_duplicate_permissions(self):
++        """
++        The migration should handle the case where a permission with the same
++        codename already exists for the proxy model's content_type.
++        This is the main issue from Django ticket #11283.
++        """
++        # This should not raise an IntegrityError
++        update_proxy_permissions.update_proxy_model_permissions(apps, None)
++        
++        # After migration, we should have only one permission with the proxy content_type
++        permissions = Permission.objects.filter(
++            content_type=self.proxy_content_type,
++            codename='add_proxy',
++        )
++        self.assertEqual(permissions.count(), 1)
++
++    def test_migration_handles_duplicate_custom_permissions(self):
++        """
++        The migration should handle duplicate custom permissions as well.
++        """
++        Permission.objects.all().delete()
++        
++        # Create a custom permission with the concrete model's content_type
++        custom_permission_concrete = Permission.objects.create(
++            content_type=self.concrete_content_type,
++            codename='display_proxys',
++            name='May display proxys information',
++        )
++        
++        # Create a custom permission with the same codename but with the proxy model's content_type
++        custom_permission_proxy = Permission.objects.create(
++            content_type=self.proxy_content_type,
++            codename='display_proxys',
++            name='May display proxys information',
++        )
++        
++        # This should not raise an IntegrityError
++        update_proxy_permissions.update_proxy_model_permissions(apps, None)
++        
++        # After migration, we should have only one permission with the proxy content_type
++        permissions = Permission.objects.filter(
++            content_type=self.proxy_content_type,
++            codename='display_proxys',
++        )
++        self.assertEqual(permissions.count(), 1)
++
++    def test_migration_backward_with_duplicates(self):
++        """
++        Test that backward migration also handles duplicates correctly.
++        """
++        # First migrate forward
++        update_proxy_permissions.update_proxy_model_permissions(apps, None)
++        
++        # Create a duplicate permission for the concrete model
++        Permission.objects.create(
++            content_type=self.concrete_content_type,
++            codename='add_proxy',
++            name='Can add proxy',
++        )
++        
++        # Now migrate backward - this should not raise an IntegrityError
++        update_proxy_permissions.revert_proxy_model_permissions(apps, None)
++        
++        # After backward migration, we should have only one permission with the concrete content_type
++        permissions = Permission.objects.filter(
++            content_type=self.concrete_content_type,
++            codename='add_proxy',
++        )
++        self.assertEqual(permissions.count(), 1)
++
++    def test_migration_with_multiple_duplicate_permissions(self):
++        """
++        Test the migration when there are multiple permissions with duplicates.
++        """
++        Permission.objects.all().delete()
++        
++        # Create multiple permissions with the concrete model's content_type
++        perm1_concrete = Permission.objects.create(
++            content_type=self.concrete_content_type,
++            codename='add_proxy',
++            name='Can add proxy',
++        )
++        perm2_concrete = Permission.objects.create(
++            content_type=self.concrete_content_type,
++            codename='change_proxy',
++            name='Can change proxy',
++        )
++        perm3_concrete = Permission.objects.create(
++            content_type=self.concrete_content_type,
++            codename='delete_proxy',
++            name='Can delete proxy',
++        )
++        
++        # Create permissions with the same codenames but with the proxy model's content_type
++        perm1_proxy = Permission.objects.create(
++            content_type=self.proxy_content_type,
++            codename='add_proxy',
++            name='Can add proxy',
++        )
++        perm2_proxy = Permission.objects.create(
++            content_type=self.proxy_content_type,
++            codename='change_proxy',
++            name='Can change proxy',
++        )
++        perm3_proxy = Permission.objects.create(
++            content_type=self.proxy_content_type,
++            codename='delete_proxy',
++            name='Can delete proxy',
++        )
++        
++        # This should not raise an IntegrityError
++        update_proxy_permissions.update_proxy_model_permissions(apps, None)
++        
++        # After migration, we should have only one permission for each codename with the proxy content_type
++        for codename in ['add_proxy', 'change_proxy', 'delete_proxy']:
++            permissions = Permission.objects.filter(
++                content_type=self.proxy_content_type,
++                codename=codename,
++            )
++            self.assertEqual(permissions.count(), 1)

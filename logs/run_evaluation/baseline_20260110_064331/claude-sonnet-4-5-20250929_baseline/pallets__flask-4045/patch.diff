@@ -1,0 +1,57 @@
+diff --git a/src/flask/blueprints.py b/src/flask/blueprints.py
+index 5fb84d86..e5d66eae 100644
+--- a/src/flask/blueprints.py
++++ b/src/flask/blueprints.py
+@@ -189,6 +189,8 @@ class Blueprint(Scaffold):
+             root_path=root_path,
+         )
+         self.name = name
++        if "." in name:
++            raise ValueError("Blueprint names should not contain dots")
+         self.url_prefix = url_prefix
+         self.subdomain = subdomain
+         self.deferred_functions: t.List[DeferredSetupFunction] = []
+diff --git a/tests/test_blueprints.py b/tests/test_blueprints.py
+index b986ca02..93ecf993 100644
+--- a/tests/test_blueprints.py
++++ b/tests/test_blueprints.py
+@@ -254,27 +254,18 @@ def test_templates_list(test_apps):
+ 
+ 
+ def test_dotted_names(app, client):
+-    frontend = flask.Blueprint("myapp.frontend", __name__)
+-    backend = flask.Blueprint("myapp.backend", __name__)
+-
+-    @frontend.route("/fe")
+-    def frontend_index():
+-        return flask.url_for("myapp.backend.backend_index")
+-
+-    @frontend.route("/fe2")
+-    def frontend_page2():
+-        return flask.url_for(".frontend_index")
+-
+-    @backend.route("/be")
+-    def backend_index():
+-        return flask.url_for("myapp.frontend.frontend_index")
+-
+-    app.register_blueprint(frontend)
+-    app.register_blueprint(backend)
+-
+-    assert client.get("/fe").data.strip() == b"/be"
+-    assert client.get("/fe2").data.strip() == b"/fe"
+-    assert client.get("/be").data.strip() == b"/fe"
++    """Blueprint names should not contain dots."""
++    # Dots in blueprint names are not allowed since they're used for nesting
++    with pytest.raises(ValueError) as exc_info:
++        flask.Blueprint("myapp.frontend", __name__)
++    
++    assert "Blueprint names should not contain dots" in str(exc_info.value)
++    
++    # Also test with backend
++    with pytest.raises(ValueError) as exc_info:
++        flask.Blueprint("myapp.backend", __name__)
++    
++    assert "Blueprint names should not contain dots" in str(exc_info.value)
+ 
+ 
+ def test_dotted_names_from_app(app, client):

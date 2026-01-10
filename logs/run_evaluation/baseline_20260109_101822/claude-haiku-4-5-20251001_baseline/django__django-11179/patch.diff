@@ -1,0 +1,33 @@
+diff --git a/django/db/models/deletion.py b/django/db/models/deletion.py
+index 92fe4affb9..3a462f1c4c 100644
+--- a/django/db/models/deletion.py
++++ b/django/db/models/deletion.py
+@@ -277,6 +277,7 @@ class Collector:
+             if self.can_fast_delete(instance):
+                 with transaction.mark_for_rollback_on_error():
+                     count = sql.DeleteQuery(model).delete_batch([instance.pk], self.using)
++                setattr(instance, model._meta.pk.attname, None)
+                 return count, {model._meta.label: count}
+ 
+         with transaction.atomic(using=self.using, savepoint=False):
+diff --git a/tests/delete/tests.py b/tests/delete/tests.py
+index 55eeb226ea..eb98db4fd8 100644
+--- a/tests/delete/tests.py
++++ b/tests/delete/tests.py
+@@ -522,3 +522,16 @@ class FastDeleteTests(TestCase):
+                 User.objects.filter(avatar__desc='missing').delete(),
+                 (0, {'delete.User': 0})
+             )
++
++    def test_fast_delete_no_dependencies_clears_pk(self):
++        """
++        Test that deleting a model with no dependencies clears the PK.
++        This is a regression test for the fast delete optimization.
++        """
++        b = Base.objects.create()
++        b_pk = b.pk
++        b.delete()
++        # After deletion, the PK should be None
++        self.assertIsNone(b.pk)
++        # And the object should not exist in the database
++        self.assertFalse(Base.objects.filter(pk=b_pk).exists())

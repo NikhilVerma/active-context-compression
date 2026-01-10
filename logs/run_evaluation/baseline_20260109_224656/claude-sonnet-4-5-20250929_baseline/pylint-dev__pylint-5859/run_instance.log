@@ -1,0 +1,85 @@
+2026-01-09 22:51:59,532 - INFO - Creating container for pylint-dev__pylint-5859...
+2026-01-09 22:51:59,851 - INFO - Container for pylint-dev__pylint-5859 created: 3e1325e2a713b3dafaa27ad6112c71bd6350e80d71a428e646e128c182721b0b
+2026-01-09 22:51:59,920 - INFO - Container for pylint-dev__pylint-5859 started: 3e1325e2a713b3dafaa27ad6112c71bd6350e80d71a428e646e128c182721b0b
+2026-01-09 22:51:59,921 - INFO - Intermediate patch for pylint-dev__pylint-5859 written to logs/run_evaluation/baseline_20260109_224656/claude-sonnet-4-5-20250929_baseline/pylint-dev__pylint-5859/patch.diff, now applying to container...
+2026-01-09 22:51:59,996 - INFO - >>>>> Applied Patch:
+Checking patch pylint/checkers/misc.py...
+Checking patch tests/checkers/unittest_misc.py...
+Applied patch pylint/checkers/misc.py cleanly.
+Applied patch tests/checkers/unittest_misc.py cleanly.
+
+2026-01-09 22:52:00,121 - INFO - Git diff before:
+diff --git a/pylint/checkers/misc.py b/pylint/checkers/misc.py
+index 69149e61a..e87c92d36 100644
+--- a/pylint/checkers/misc.py
++++ b/pylint/checkers/misc.py
+@@ -121,9 +121,9 @@ class EncodingChecker(BaseChecker):
+ 
+         notes = "|".join(re.escape(note) for note in self.config.notes)
+         if self.config.notes_rgx:
+-            regex_string = rf"#\s*({notes}|{self.config.notes_rgx})\b"
++            regex_string = rf"#\s*({notes}|{self.config.notes_rgx})(?=\s|:|$)"
+         else:
+-            regex_string = rf"#\s*({notes})\b"
++            regex_string = rf"#\s*({notes})(?=\s|:|$)"
+ 
+         self._fixme_pattern = re.compile(regex_string, re.I)
+ 
+diff --git a/tests/checkers/unittest_misc.py b/tests/checkers/unittest_misc.py
+index 23e19a9d0..50912c7f5 100644
+--- a/tests/checkers/unittest_misc.py
++++ b/tests/checkers/unittest_misc.py
+@@ -120,3 +120,25 @@ class TestFixme(CheckerTestCase):
+         """
+         with self.assertNoMessages():
+             self.checker.process_tokens(_tokenize_str(code))
++
++    @set_config(notes=["???"])
++    def test_punctuation_only_note_tag(self) -> None:
++        """Test that punctuation-only note tags are detected (issue #5859)."""
++        code = """# ???: no
++                """
++        with self.assertAddsMessages(
++            MessageTest(msg_id="fixme", line=1, args="???: no", col_offset=1)
++        ):
++            self.checker.process_tokens(_tokenize_str(code))
++
++    @set_config(notes=["YES", "???"])
++    def test_punctuation_and_word_note_tags(self) -> None:
++        """Test that both word and punctuation note tags work together."""
++        code = """# YES: yes
++                # ???: no
++                """
++        with self.assertAddsMessages(
++            MessageTest(msg_id="fixme", line=1, args="YES: yes", col_offset=1),
++            MessageTest(msg_id="fixme", line=2, args="???: no", col_offset=17),
++        ):
++            self.checker.process_tokens(_tokenize_str(code))
+2026-01-09 22:52:00,122 - INFO - Eval script for pylint-dev__pylint-5859 written to logs/run_evaluation/baseline_20260109_224656/claude-sonnet-4-5-20250929_baseline/pylint-dev__pylint-5859/eval.sh; copying to container...
+2026-01-09 22:52:03,469 - INFO - Test runtime: 3.32 seconds
+2026-01-09 22:52:03,471 - INFO - Test output for pylint-dev__pylint-5859 written to logs/run_evaluation/baseline_20260109_224656/claude-sonnet-4-5-20250929_baseline/pylint-dev__pylint-5859/test_output.txt
+2026-01-09 22:52:03,531 - INFO - Git diff after:
+diff --git a/pylint/checkers/misc.py b/pylint/checkers/misc.py
+index 69149e61a..e87c92d36 100644
+--- a/pylint/checkers/misc.py
++++ b/pylint/checkers/misc.py
+@@ -121,9 +121,9 @@ class EncodingChecker(BaseChecker):
+ 
+         notes = "|".join(re.escape(note) for note in self.config.notes)
+         if self.config.notes_rgx:
+-            regex_string = rf"#\s*({notes}|{self.config.notes_rgx})\b"
++            regex_string = rf"#\s*({notes}|{self.config.notes_rgx})(?=\s|:|$)"
+         else:
+-            regex_string = rf"#\s*({notes})\b"
++            regex_string = rf"#\s*({notes})(?=\s|:|$)"
+ 
+         self._fixme_pattern = re.compile(regex_string, re.I)
+2026-01-09 22:52:03,531 - INFO - Git diff changed after running eval script
+2026-01-09 22:52:03,531 - INFO - Grading answer for pylint-dev__pylint-5859...
+2026-01-09 22:52:03,533 - INFO - report: {'pylint-dev__pylint-5859': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': True, 'tests_status': {'FAIL_TO_PASS': {'success': ['tests/checkers/unittest_misc.py::TestFixme::test_non_alphanumeric_codetag'], 'failure': []}, 'PASS_TO_PASS': {'success': ['tests/checkers/unittest_misc.py::TestFixme::test_fixme_with_message', 'tests/checkers/unittest_misc.py::TestFixme::test_todo_without_message', 'tests/checkers/unittest_misc.py::TestFixme::test_xxx_without_space', 'tests/checkers/unittest_misc.py::TestFixme::test_xxx_middle', 'tests/checkers/unittest_misc.py::TestFixme::test_without_space_fixme', 'tests/checkers/unittest_misc.py::TestFixme::test_absent_codetag', 'tests/checkers/unittest_misc.py::TestFixme::test_other_present_codetag', 'tests/checkers/unittest_misc.py::TestFixme::test_issue_2321_should_not_trigger', 'tests/checkers/unittest_misc.py::TestFixme::test_issue_2321_should_trigger', 'tests/checkers/unittest_misc.py::TestFixme::test_dont_trigger_on_todoist'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for pylint-dev__pylint-5859: resolved: True
+2026-01-09 22:52:03,534 - INFO - Attempting to stop container sweb.eval.pylint-dev__pylint-5859.baseline_20260109_224656...
+2026-01-09 22:52:18,711 - INFO - Attempting to remove container sweb.eval.pylint-dev__pylint-5859.baseline_20260109_224656...
+2026-01-09 22:52:18,732 - INFO - Container sweb.eval.pylint-dev__pylint-5859.baseline_20260109_224656 removed.
+2026-01-09 22:52:18,732 - INFO - Attempting to remove image swebench/sweb.eval.x86_64.pylint-dev_1776_pylint-5859:latest...
+2026-01-09 22:52:18,941 - INFO - Image swebench/sweb.eval.x86_64.pylint-dev_1776_pylint-5859:latest removed.

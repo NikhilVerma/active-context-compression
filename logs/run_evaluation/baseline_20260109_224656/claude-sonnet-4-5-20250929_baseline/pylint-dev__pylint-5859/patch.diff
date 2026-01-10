@@ -1,0 +1,46 @@
+diff --git a/pylint/checkers/misc.py b/pylint/checkers/misc.py
+index 69149e61a..e87c92d36 100644
+--- a/pylint/checkers/misc.py
++++ b/pylint/checkers/misc.py
+@@ -121,9 +121,9 @@ class EncodingChecker(BaseChecker):
+ 
+         notes = "|".join(re.escape(note) for note in self.config.notes)
+         if self.config.notes_rgx:
+-            regex_string = rf"#\s*({notes}|{self.config.notes_rgx})\b"
++            regex_string = rf"#\s*({notes}|{self.config.notes_rgx})(?=\s|:|$)"
+         else:
+-            regex_string = rf"#\s*({notes})\b"
++            regex_string = rf"#\s*({notes})(?=\s|:|$)"
+ 
+         self._fixme_pattern = re.compile(regex_string, re.I)
+ 
+diff --git a/tests/checkers/unittest_misc.py b/tests/checkers/unittest_misc.py
+index 23e19a9d0..50912c7f5 100644
+--- a/tests/checkers/unittest_misc.py
++++ b/tests/checkers/unittest_misc.py
+@@ -120,3 +120,25 @@ class TestFixme(CheckerTestCase):
+         """
+         with self.assertNoMessages():
+             self.checker.process_tokens(_tokenize_str(code))
++
++    @set_config(notes=["???"])
++    def test_punctuation_only_note_tag(self) -> None:
++        """Test that punctuation-only note tags are detected (issue #5859)."""
++        code = """# ???: no
++                """
++        with self.assertAddsMessages(
++            MessageTest(msg_id="fixme", line=1, args="???: no", col_offset=1)
++        ):
++            self.checker.process_tokens(_tokenize_str(code))
++
++    @set_config(notes=["YES", "???"])
++    def test_punctuation_and_word_note_tags(self) -> None:
++        """Test that both word and punctuation note tags work together."""
++        code = """# YES: yes
++                # ???: no
++                """
++        with self.assertAddsMessages(
++            MessageTest(msg_id="fixme", line=1, args="YES: yes", col_offset=1),
++            MessageTest(msg_id="fixme", line=2, args="???: no", col_offset=17),
++        ):
++            self.checker.process_tokens(_tokenize_str(code))

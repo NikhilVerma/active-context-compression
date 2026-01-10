@@ -1,0 +1,129 @@
+2026-01-09 20:43:48,969 - INFO - Creating container for mwaskom__seaborn-2848...
+2026-01-09 20:43:49,416 - INFO - Container for mwaskom__seaborn-2848 created: bfac2d1df81bd7608af88dbf210906e455692bf6c296bc98769c7c1b3177db92
+2026-01-09 20:43:49,517 - INFO - Container for mwaskom__seaborn-2848 started: bfac2d1df81bd7608af88dbf210906e455692bf6c296bc98769c7c1b3177db92
+2026-01-09 20:43:49,519 - INFO - Intermediate patch for mwaskom__seaborn-2848 written to logs/run_evaluation/focus_20260109_203834/claude-sonnet-4-5-20250929_focus/mwaskom__seaborn-2848/patch.diff, now applying to container...
+2026-01-09 20:43:49,611 - INFO - >>>>> Applied Patch:
+Checking patch seaborn/axisgrid.py...
+Applied patch seaborn/axisgrid.py cleanly.
+
+2026-01-09 20:43:49,708 - INFO - Git diff before:
+diff --git a/seaborn/axisgrid.py b/seaborn/axisgrid.py
+index 8526f44b..28dee4fc 100644
+--- a/seaborn/axisgrid.py
++++ b/seaborn/axisgrid.py
+@@ -1478,6 +1478,9 @@ class PairGrid(Grid):
+         # Plot on each of the diagonal axes
+         fixed_color = kwargs.pop("color", None)
+ 
++        # Use hue_order from kwargs if present, otherwise use self._hue_order
++        hue_order = kwargs.pop("hue_order", self._hue_order)
++
+         for var, ax in zip(self.diag_vars, self.diag_axes):
+             hue_grouped = self.data[var].groupby(self.hue_vals)
+ 
+@@ -1487,7 +1490,7 @@ class PairGrid(Grid):
+             else:
+                 plt.sca(ax)
+ 
+-            for k, label_k in enumerate(self._hue_order):
++            for label_k in hue_order:
+ 
+                 # Attempt to get data for this level, allowing for empty
+                 try:
+@@ -1496,6 +1499,8 @@ class PairGrid(Grid):
+                     data_k = pd.Series([], dtype=float)
+ 
+                 if fixed_color is None:
++                    # Find the index of label_k in self._hue_order for palette lookup
++                    k = list(self._hue_order).index(label_k)
+                     color = self.palette[k]
+                 else:
+                     color = fixed_color
+@@ -1586,8 +1591,11 @@ class PairGrid(Grid):
+         else:
+             axes_vars = [x_var, y_var]
+ 
++        # Use hue_order from kwargs if present, otherwise use self._hue_order
++        hue_order = kwargs.pop("hue_order", self._hue_order)
++
+         hue_grouped = self.data.groupby(self.hue_vals)
+-        for k, label_k in enumerate(self._hue_order):
++        for label_k in hue_order:
+ 
+             kws = kwargs.copy()
+ 
+@@ -1604,6 +1612,8 @@ class PairGrid(Grid):
+             x = data_k[x_var]
+             y = data_k[y_var]
+ 
++            # Find the index of label_k in self._hue_order for palette and hue_kws lookup
++            k = list(self._hue_order).index(label_k)
+             for kw, val_list in self.hue_kws.items():
+                 kws[kw] = val_list[k]
+             kws.setdefault("color", self.palette[k])
+2026-01-09 20:43:49,709 - INFO - Eval script for mwaskom__seaborn-2848 written to logs/run_evaluation/focus_20260109_203834/claude-sonnet-4-5-20250929_focus/mwaskom__seaborn-2848/eval.sh; copying to container...
+2026-01-09 20:44:07,007 - INFO - Test runtime: 17.27 seconds
+2026-01-09 20:44:07,009 - INFO - Test output for mwaskom__seaborn-2848 written to logs/run_evaluation/focus_20260109_203834/claude-sonnet-4-5-20250929_focus/mwaskom__seaborn-2848/test_output.txt
+2026-01-09 20:44:07,065 - INFO - Git diff after:
+diff --git a/seaborn/axisgrid.py b/seaborn/axisgrid.py
+index 8526f44b..28dee4fc 100644
+--- a/seaborn/axisgrid.py
++++ b/seaborn/axisgrid.py
+@@ -1478,6 +1478,9 @@ class PairGrid(Grid):
+         # Plot on each of the diagonal axes
+         fixed_color = kwargs.pop("color", None)
+ 
++        # Use hue_order from kwargs if present, otherwise use self._hue_order
++        hue_order = kwargs.pop("hue_order", self._hue_order)
++
+         for var, ax in zip(self.diag_vars, self.diag_axes):
+             hue_grouped = self.data[var].groupby(self.hue_vals)
+ 
+@@ -1487,7 +1490,7 @@ class PairGrid(Grid):
+             else:
+                 plt.sca(ax)
+ 
+-            for k, label_k in enumerate(self._hue_order):
++            for label_k in hue_order:
+ 
+                 # Attempt to get data for this level, allowing for empty
+                 try:
+@@ -1496,6 +1499,8 @@ class PairGrid(Grid):
+                     data_k = pd.Series([], dtype=float)
+ 
+                 if fixed_color is None:
++                    # Find the index of label_k in self._hue_order for palette lookup
++                    k = list(self._hue_order).index(label_k)
+                     color = self.palette[k]
+                 else:
+                     color = fixed_color
+@@ -1586,8 +1591,11 @@ class PairGrid(Grid):
+         else:
+             axes_vars = [x_var, y_var]
+ 
++        # Use hue_order from kwargs if present, otherwise use self._hue_order
++        hue_order = kwargs.pop("hue_order", self._hue_order)
++
+         hue_grouped = self.data.groupby(self.hue_vals)
+-        for k, label_k in enumerate(self._hue_order):
++        for label_k in hue_order:
+ 
+             kws = kwargs.copy()
+ 
+@@ -1604,6 +1612,8 @@ class PairGrid(Grid):
+             x = data_k[x_var]
+             y = data_k[y_var]
+ 
++            # Find the index of label_k in self._hue_order for palette and hue_kws lookup
++            k = list(self._hue_order).index(label_k)
+             for kw, val_list in self.hue_kws.items():
+                 kws[kw] = val_list[k]
+             kws.setdefault("color", self.palette[k])
+2026-01-09 20:44:07,065 - INFO - Grading answer for mwaskom__seaborn-2848...
+2026-01-09 20:44:07,070 - INFO - report: {'mwaskom__seaborn-2848': {'patch_is_None': False, 'patch_exists': True, 'patch_successfully_applied': True, 'resolved': False, 'tests_status': {'FAIL_TO_PASS': {'success': [], 'failure': ['tests/test_relational.py::TestScatterPlotter::test_hue_order']}, 'PASS_TO_PASS': {'success': ['tests/test_relational.py::TestRelationalPlotter::test_wide_df_variables', 'tests/test_relational.py::TestRelationalPlotter::test_wide_df_with_nonnumeric_variables', 'tests/test_relational.py::TestRelationalPlotter::test_wide_array_variables', 'tests/test_relational.py::TestRelationalPlotter::test_flat_array_variables', 'tests/test_relational.py::TestRelationalPlotter::test_flat_list_variables', 'tests/test_relational.py::TestRelationalPlotter::test_flat_series_variables', 'tests/test_relational.py::TestRelationalPlotter::test_wide_list_of_series_variables', 'tests/test_relational.py::TestRelationalPlotter::test_wide_list_of_arrays_variables', 'tests/test_relational.py::TestRelationalPlotter::test_wide_list_of_list_variables', 'tests/test_relational.py::TestRelationalPlotter::test_wide_dict_of_series_variables', 'tests/test_relational.py::TestRelationalPlotter::test_wide_dict_of_arrays_variables', 'tests/test_relational.py::TestRelationalPlotter::test_wide_dict_of_lists_variables', 'tests/test_relational.py::TestRelationalPlotter::test_relplot_complex', 'tests/test_relational.py::TestRelationalPlotter::test_relplot_vectors[series]', 'tests/test_relational.py::TestRelationalPlotter::test_relplot_vectors[numpy]', 'tests/test_relational.py::TestRelationalPlotter::test_relplot_vectors[list]', 'tests/test_relational.py::TestRelationalPlotter::test_relplot_wide', 'tests/test_relational.py::TestRelationalPlotter::test_relplot_hues', 'tests/test_relational.py::TestRelationalPlotter::test_relplot_sizes', 'tests/test_relational.py::TestRelationalPlotter::test_relplot_styles', 'tests/test_relational.py::TestRelationalPlotter::test_relplot_stringy_numerics', 'tests/test_relational.py::TestRelationalPlotter::test_relplot_data', 'tests/test_relational.py::TestRelationalPlotter::test_facet_variable_collision', 'tests/test_relational.py::TestRelationalPlotter::test_ax_kwarg_removal', 'tests/test_relational.py::TestLinePlotter::test_legend_data', 'tests/test_relational.py::TestLinePlotter::test_plot', 'tests/test_relational.py::TestLinePlotter::test_axis_labels', 'tests/test_relational.py::TestScatterPlotter::test_color', 'tests/test_relational.py::TestScatterPlotter::test_legend_data', 'tests/test_relational.py::TestScatterPlotter::test_plot', 'tests/test_relational.py::TestScatterPlotter::test_axis_labels', 'tests/test_relational.py::TestScatterPlotter::test_scatterplot_axes', 'tests/test_relational.py::TestScatterPlotter::test_literal_attribute_vectors', 'tests/test_relational.py::TestScatterPlotter::test_supplied_color_array', 'tests/test_relational.py::TestScatterPlotter::test_linewidths', 'tests/test_relational.py::TestScatterPlotter::test_size_norm_extrapolation', 'tests/test_relational.py::TestScatterPlotter::test_datetime_scale', 'tests/test_relational.py::TestScatterPlotter::test_scatterplot_vs_relplot[long_semantics0]', 'tests/test_relational.py::TestScatterPlotter::test_scatterplot_vs_relplot[long_semantics1]', 'tests/test_relational.py::TestScatterPlotter::test_scatterplot_vs_relplot[long_semantics2]', 'tests/test_relational.py::TestScatterPlotter::test_scatterplot_vs_relplot[long_semantics3]', 'tests/test_relational.py::TestScatterPlotter::test_scatterplot_vs_relplot[long_semantics4]', 'tests/test_relational.py::TestScatterPlotter::test_scatterplot_vs_relplot[long_semantics5]', 'tests/test_relational.py::TestScatterPlotter::test_scatterplot_vs_relplot[long_semantics6]', 'tests/test_relational.py::TestScatterPlotter::test_scatterplot_vs_relplot[long_semantics7]', 'tests/test_relational.py::TestScatterPlotter::test_scatterplot_vs_relplot[long_semantics8]', 'tests/test_relational.py::TestScatterPlotter::test_scatterplot_vs_relplot[long_semantics9]', 'tests/test_relational.py::TestScatterPlotter::test_scatterplot_vs_relplot[long_semantics10]', 'tests/test_relational.py::TestScatterPlotter::test_scatterplot_vs_relplot[long_semantics11]', 'tests/test_relational.py::TestScatterPlotter::test_scatterplot_smoke'], 'failure': []}, 'FAIL_TO_FAIL': {'success': [], 'failure': []}, 'PASS_TO_FAIL': {'success': [], 'failure': []}}}}
+Result for mwaskom__seaborn-2848: resolved: False
+2026-01-09 20:44:07,071 - INFO - Attempting to stop container sweb.eval.mwaskom__seaborn-2848.focus_20260109_203834...
+2026-01-09 20:44:22,297 - INFO - Attempting to remove container sweb.eval.mwaskom__seaborn-2848.focus_20260109_203834...
+2026-01-09 20:44:22,314 - INFO - Container sweb.eval.mwaskom__seaborn-2848.focus_20260109_203834 removed.
+2026-01-09 20:44:22,315 - INFO - Attempting to remove image swebench/sweb.eval.x86_64.mwaskom_1776_seaborn-2848:latest...
+2026-01-09 20:44:23,118 - INFO - Image swebench/sweb.eval.x86_64.mwaskom_1776_seaborn-2848:latest removed.

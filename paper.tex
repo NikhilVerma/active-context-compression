@@ -27,7 +27,7 @@ nikhilgotmail@gmail.com}
 \maketitle
 
 \begin{abstract}
-Large Language Model (LLM) agents struggle with long-horizon software engineering tasks due to ``Context Bloat.'' As interaction history grows, computational costs explode, latency increases, and reasoning capabilities degrade due to distraction by irrelevant past errors. Existing solutions often rely on passive, external summarization mechanisms that the agent cannot control. This paper proposes \textbf{Focus}, an agent-centric architecture inspired by the biological exploration strategies of \textit{Physarum polycephalum} (slime mold). The Focus Agent actively explores a solution path, consolidates key learnings into a persistent ``Knowledge'' block upon reaching a milestone or dead end, and actively withdraws (prunes) the raw interaction history. Evaluated on the SWE-bench Lite benchmark, Focus demonstrates two key benefits: (1) for capable models like Claude Sonnet, it reduces token consumption by \textbf{51\%} while maintaining 100\% task success rate; (2) for smaller models like Claude Haiku, it \textbf{improves success rate by 50\%} (from 20\% to 30\%) by maintaining cognitive hygiene. We demonstrate that active context management converts the hard limit of context windows into a sustainable ``cognitive tax,'' enabling both cost savings and improved reasoning for resource-constrained models.
+Large Language Model (LLM) agents struggle with long-horizon software engineering tasks due to ``Context Bloat.'' As interaction history grows, computational costs explode, latency increases, and reasoning capabilities degrade due to distraction by irrelevant past errors. Existing solutions often rely on passive, external summarization mechanisms that the agent cannot control. This paper proposes \textbf{Focus}, an agent-centric architecture inspired by the biological exploration strategies of \textit{Physarum polycephalum} (slime mold). The Focus Agent autonomously decides when to consolidate key learnings into a persistent ``Knowledge'' block and actively withdraws (prunes) the raw interaction history. Evaluated on the SWE-bench Lite benchmark using the official Docker-based harness, Focus achieves \textbf{32\% token savings} compared to baseline agents. This compression comes with a trade-off: a modest accuracy reduction (60\% baseline success vs. 40\% Focus success on N=5 instances) due to information loss during aggressive pruning. We demonstrate that active, model-controlled context management provides a valuable engineering trade-off for long-horizon tasks, converting the hard limit of context windows into a sustainable ``cognitive tax.''
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -62,12 +62,12 @@ We propose a shift from \textit{Passive Retention} to \textit{Active Compression
 Biological systems do not retain a perfect record of every muscle movement used to navigate a maze; they retain the \textit{learned map}. Similarly, an agent exploring a codebase does not need to remember the 50 lines of \texttt{ls -R} output from ten minutes ago; it only needs to remember that ``the config file is not in the \texttt{/src} directory.''
 
 \subsection{Architecture: The Focus Loop}
-The Focus architecture introduces two primitives to the standard ReAct agent loop: \texttt{start\_focus} and \texttt{complete\_focus}.
+The Focus architecture introduces two primitives to the standard ReAct agent loop: \texttt{start\_focus} and \texttt{complete\_focus}. Crucially, the agent has \textit{full autonomy} over when to invoke these tools---there are no external timers or heuristics forcing compression.
 
 \begin{enumerate}
-    \item \textbf{Start Focus:} The agent declares a distinct line of investigation (e.g., ``Debug the database connection''). This marks a checkpoint in the conversation history.
+    \item \textbf{Start Focus:} The agent declares what it's investigating (e.g., ``Debug the database connection''). This marks a checkpoint in the conversation history.
     \item \textbf{Explore:} The agent uses standard tools (read, edit, run) to perform work.
-    \item \textbf{Consolidate (The Nudge):} When the agent completes the sub-task or hits a dead end, it is prompted to call \texttt{complete\_focus}. Crucially, the agent \textit{itself} generates a summary of:
+    \item \textbf{Consolidate:} When the agent naturally completes the sub-task or hits a dead end, it \textit{decides} to call \texttt{complete\_focus}, generating a summary of:
     \begin{itemize}
         \item What was attempted?
         \item What was learned (facts, file paths, bugs)?
@@ -76,52 +76,39 @@ The Focus architecture introduces two primitives to the standard ReAct agent loo
     \item \textbf{Withdraw:} The system takes this summary, appends it to a persistent ``Knowledge'' block at the top of the context, and \textit{deletes} all messages between the checkpoint and the current step.
 \end{enumerate}
 
-This converts the context from a monotonically increasing log into a ``Sawtooth'' pattern, where context grows during exploration and collapses during consolidation.
+This converts the context from a monotonically increasing log into a ``Sawtooth'' pattern, where context grows during exploration and collapses during consolidation. The model controls this cycle based on task structure, not arbitrary step counts.
 
 \section{Experiments}
-We evaluated the Focus architecture on \textbf{SWE-bench Lite}, a benchmark for software engineering agents solving real GitHub issues. All evaluations used the official SWE-bench Docker-based harness to ensure accurate pass/fail determination. We ran experiments using two models: \texttt{claude-sonnet-4-5-20250929} (N=3) and \texttt{claude-haiku-4-5-20251001} (N=10) to test Focus across different model capability levels.
+We evaluated the Focus architecture on \textbf{SWE-bench Lite}, a benchmark for software engineering agents solving real GitHub issues. All evaluations used the official SWE-bench Docker-based harness to ensure reproducible, leaderboard-quality pass/fail determination. We ran a controlled A/B comparison using \texttt{claude-sonnet-4-5-20250929} on N=5 instances, running both Baseline and Focus agents on identical tasks to measure the efficiency-accuracy trade-off.
 
 \subsection{Results}
 
 \begin{table}[htbp]
-\caption{Performance on SWE-bench Lite (Sonnet, N=3)}
+\caption{A/B Comparison on SWE-bench Lite (Sonnet, N=5)}
 \begin{center}
 \begin{tabular}{lccc}
 \toprule
 \textbf{Metric} & \textbf{Baseline} & \textbf{Focus (Ours)} & \textbf{Delta} \\
 \midrule
-Task Success Rate & 100\% (3/3) & 100\% (3/3) & -- \\
-Total Tokens & 9,886,342 & 4,857,293 & \textbf{-50.9\%} \\
-Total Messages & 367 & 58 & \textbf{-84.2\%} \\
-Compressions & -- & 16 & -- \\
+Task Success Rate & 60\% (3/5) & 40\% (2/5) & -20\% \\
+Avg Total Tokens & 3,357,134 & 2,289,904 & \textbf{-31.8\%} \\
+Avg Message Count & 134.2 & 36.6 & \textbf{-72.7\%} \\
+Avg Compressions & 0 & 2.6 & -- \\
+Messages Dropped & 0 & 115.4 & -- \\
+Avg Wall Time (sec) & 521 & 471 & -9.5\% \\
 \bottomrule
 \end{tabular}
 \label{tab1}
 \end{center}
 \end{table}
 
-\begin{table}[htbp]
-\caption{Performance on SWE-bench Lite (Haiku, N=10)}
-\begin{center}
-\begin{tabular}{lccc}
-\toprule
-\textbf{Metric} & \textbf{Baseline} & \textbf{Focus (Ours)} & \textbf{Delta} \\
-\midrule
-Task Success Rate & 20\% (2/10) & \textbf{30\% (3/10)} & \textbf{+50\%} \\
-Problems Solved & 2 & \textbf{3} & \textbf{+1} \\
-Total Messages & 259 & 182 & -29.7\% \\
-Compressions & -- & 12 & -- \\
-\bottomrule
-\end{tabular}
-\label{tab2}
-\end{center}
-\end{table}
-
 \subsection{Key Findings}
 
-\textbf{Finding 1: Efficiency for Capable Models.} On Claude Sonnet (Table~\ref{tab1}), both agents achieved 100\% success rate on the tested Django instances. However, Focus accomplished this while consuming \textbf{51\% fewer tokens} and maintaining an 84\% smaller context. This demonstrates that context compression preserves problem-solving capability while dramatically reducing costs.
+\textbf{Finding 1: Significant Token Savings.} Focus achieved a \textbf{32\% reduction in token consumption} (Table~\ref{tab1}), demonstrating that model-controlled compression successfully reduces computational costs. The agent compressed on average 2.6 times per task, dropping 115 messages while preserving key learnings in a structured knowledge block.
 
-\textbf{Finding 2: Improved Success for Smaller Models.} On Claude Haiku (Table~\ref{tab2}), Focus achieved a \textbf{50\% higher success rate} than baseline (30\% vs 20\%). Notably, Focus solved \texttt{django\_\_django-11039} that Baseline could not. This suggests that maintaining ``cognitive hygiene''---keeping context clean and focused---helps smaller models reason more effectively by avoiding distraction from accumulated noise.
+\textbf{Finding 2: The Accuracy Trade-off.} Focus achieved 40\% success rate compared to Baseline's 60\% (2/5 vs 3/5 resolved instances). Analysis reveals that Focus failed on \texttt{scikit-learn\_\_scikit-learn-10297}, which Baseline solved. This suggests information loss during compression---when the agent summarizes aggressively, critical details may be discarded. This represents an honest engineering trade-off: substantial cost savings in exchange for a modest accuracy penalty.
+
+\textbf{Finding 3: Context Reduction.} Focus maintained an average of 36.6 messages compared to Baseline's 134.2 messages (73\% reduction). This dramatic reduction in context size demonstrates that the compression mechanism effectively prunes verbose exploration history while retaining task-relevant information.
 
 \begin{figure}[htbp]
 \centerline{
@@ -131,26 +118,26 @@ Compressions & -- & 12 & -- \\
     enlargelimits=0.15,
     legend style={at={(0.5,-0.15)},
       anchor=north,legend columns=-1},
-    ylabel={Total Tokens (Millions)},
+    ylabel={Avg Tokens (Millions)},
     symbolic x coords={Baseline,Focus},
     xtick=data,
     nodes near coords,
     nodes near coords align={vertical},
-    title={Token Consumption (Sonnet, N=3)},
+    title={Token Consumption (Sonnet, N=5)},
 ]
-\addplot coordinates {(Baseline,9.89) (Focus,4.86)};
+\addplot coordinates {(Baseline,3.36) (Focus,2.29)};
 \end{axis}
 \end{tikzpicture}
 }
-\caption{Total token consumption on Sonnet benchmark. Focus reduces usage by 51\% while maintaining 100\% success rate.}
+\caption{Average token consumption per task. Focus reduces usage by 32\% through model-controlled compression.}
 \label{fig1}
 \end{figure}
 
 \subsection{Case Study: The Sawtooth Pattern}
-The efficiency gain stems from the ``Sawtooth'' context pattern. In our Sonnet experiments, the Baseline agent's context grew monotonically to over 120 messages per task on average. In contrast, the Focus agent compressed its history multiple times (averaging 5 compressions per task), dropping raw logs while retaining high-level knowledge, finishing with lean contexts under 20 messages. This pattern enables the Focus agent to explore more deeply while maintaining clarity.
+The efficiency gain stems from the ``Sawtooth'' context pattern. The Baseline agent's context grew monotonically to 134 messages per task on average. In contrast, the Focus agent compressed its history 2.6 times per task, dropping raw logs while retaining high-level knowledge, finishing with lean contexts of 37 messages on average. This pattern demonstrates that agents can explore deeply while maintaining manageable cognitive load.
 
-\subsection{Case Study: Cognitive Hygiene Helps Smaller Models}
-The most striking result is Focus solving \texttt{django\_\_django-11039} with Haiku where Baseline failed. Analysis of the trajectories suggests that Baseline's context became polluted with verbose error traces and failed attempts, causing the model to lose track of the core problem. Focus, by compressing this noise into structured learnings, maintained clarity and ultimately found the solution. This supports the hypothesis that smaller models benefit disproportionately from cognitive hygiene.
+\subsection{Case Study: When Compression Fails}
+The Focus agent failed on \texttt{scikit-learn\_\_scikit-learn-10297} despite Baseline succeeding. Analysis of the trajectory reveals that Focus compressed 3 times and dropped 119 messages. It is likely that during one of these compressions, a critical detail about the test expectations was summarized too broadly, causing the agent to implement a partial fix that failed the official test suite. This illustrates the fundamental trade-off: aggressive compression saves tokens but risks information loss.
 
 \begin{figure}[htbp]
 \centerline{
@@ -194,22 +181,13 @@ coordinates {
 \end{figure}
 
 \subsection{Analysis}
-\textbf{Efficiency:} The Focus Agent reduced token consumption by 51\% on Sonnet while maintaining 100\% success. This reduction is primarily due to avoiding the quadratic cost of re-processing long histories. 
+\textbf{Efficiency vs. Accuracy Trade-off:} The Focus Agent reduced token consumption by 32\% but achieved 20\% lower success rate (2/5 vs 3/5). This represents a real engineering trade-off: for long-horizon tasks where cost is a primary concern, Focus offers substantial savings. For tasks where accuracy is paramount, the baseline append-only strategy may be preferable.
 
-\textbf{Cognitive Hygiene:} By maintaining a context size under 20 messages on average (vs. 100+ for the baseline), the Focus agent mitigates the ``Lost in the Middle'' phenomenon, ensuring that instructions remain salient even after extended exploration.
+\textbf{Model Autonomy Works:} The agent compressed 2.6 times per task on average \textit{without any external prompting}. This demonstrates that capable models can self-regulate their context when given the appropriate tools, validating the core thesis of agent-controlled compression.
 
-\textbf{Improved Reasoning for Smaller Models:} Most significantly, Focus \textit{improved} success rates for Haiku by 50\%. This suggests that cognitive hygiene---keeping context clean and focused---is particularly valuable for less capable models that are more susceptible to distraction from accumulated noise. The compression mechanism not only preserves information but actively improves the model's ability to reason by reducing interference.
+\textbf{Context Reduction:} By maintaining a context size of 37 messages on average (vs. 134 for baseline), Focus mitigates the quadratic cost of re-processing long histories while maintaining sufficient information to complete most tasks successfully.
 
-\subsection{Ablation: Compression Frequency}
-We evaluate three compression strategies to understand the optimal balance between context retention and reduction:
 
-\begin{itemize}
-    \item \textbf{Fixed (15 steps)}: Aggressive compression to keep context lean.
-    \item \textbf{Fixed (30 steps)}: Relaxed compression to allow more local context.
-    \item \textbf{Model Triggered}: A fully autonomous mode where the agent decides when to consolidate context based on task completion, without external heuristics.
-\end{itemize}
-
-The optimal frequency likely depends on task complexity and the model's ability to self-regulate.
 
 \section{Discussion}
 \subsection{The Cost of Immortality}
@@ -221,29 +199,29 @@ For short, trivial tasks, this tax may outweigh the benefits. However, for long-
 Several limitations warrant discussion:
 
 \begin{enumerate}
-    \item \textbf{Sample Size:} Our evaluation uses N=10 (Haiku) and N=3 (Sonnet) instances. While sufficient to demonstrate both efficiency and reasoning benefits, the high computational cost of evaluating long-horizon agentic workflows limited our current sample size. How these results generalize to the full benchmark over longer evaluation runs remains to be seen.
+    \item \textbf{Sample Size:} Our evaluation uses N=5 instances. While sufficient to demonstrate the efficiency-accuracy trade-off, the high computational cost of evaluating long-horizon agentic workflows using the official Docker harness limited our sample size. How these results generalize to the full benchmark (N=300) remains to be seen.
     
-    \item \textbf{Heuristic Triggers:} The current implementation uses a time-based ``nudge'' (every 15 steps) to trigger compression. This simple heuristic works but may be suboptimal. Future work could explore adaptive triggers based on information density or task phase detection.
+    \item \textbf{Information Loss:} Compression necessarily discards details. We observed one clear case (\texttt{scikit-learn\_\_scikit-learn-10297}) where aggressive compression led to task failure. The challenge is balancing token savings against the risk of losing critical information. Future work could explore more sophisticated compression strategies that preserve key details more reliably.
     
-    \item \textbf{Information Loss:} Compression necessarily discards details. While our knowledge preservation mechanism retains key learnings, edge cases may exist where compressed information was actually needed. We did not observe this in our experiments, but it remains a theoretical concern.
-    
-    \item \textbf{Programmatic Triggers:} Our implementation programmatically triggers focus completion rather than relying on the agent to self-invoke compression. This external orchestration may be necessary for reliable memory management.
+    \item \textbf{Model Dependency:} Our results are based on Claude Sonnet 4.5. How other models (GPT-4, Gemini, etc.) perform with Focus remains an open question. Different models may have varying abilities to self-regulate compression effectively.
 \end{enumerate}
 
 \section{Conclusion}
-We have demonstrated that active context management provides two distinct benefits for LLM agents:
+We have demonstrated that model-controlled active context management provides a valuable engineering trade-off for long-horizon LLM agent tasks:
 
 \begin{enumerate}
-    \item \textbf{Cost Efficiency:} For capable models (Sonnet), Focus reduces token consumption by 51\% while maintaining 100\% task success---a direct cost savings with no capability loss.
+    \item \textbf{Substantial Cost Savings:} Focus reduces token consumption by 32\% and message count by 73\%, translating directly to reduced API costs and faster execution.
     
-    \item \textbf{Improved Reasoning:} For smaller models (Haiku), Focus improves success rate by 50\% through cognitive hygiene. By keeping context clean and focused, smaller models can reason more effectively without distraction from accumulated noise.
+    \item \textbf{Modest Accuracy Cost:} This compression comes with a 20\% reduction in success rate, representing an honest trade-off between efficiency and correctness.
 \end{enumerate}
 
-The key insight is that active context compression converts the hard limit of context windows into a sustainable ``cognitive tax.'' By preserving learnings in a structured knowledge block while pruning raw interaction history, agents can explore more deeply and reason more clearly.
+The key insight is that LLMs, when given appropriate tools, can autonomously manage their own context by deciding when to compress completed work. This converts the hard limit of context windows into a manageable ``cognitive tax'' that enables deeper exploration on long-horizon tasks.
 
-This finding has practical implications: organizations can potentially use smaller, cheaper models with Focus to achieve results comparable to larger models, or use Focus with larger models to dramatically reduce costs. The Focus architecture provides a practical, complementary approach to existing memory management techniques, operating entirely within the context window without requiring external infrastructure.
+This finding has practical implications: for cost-sensitive applications where occasional failures are acceptable (exploratory coding, prototyping, research), Focus offers substantial savings. For mission-critical applications requiring maximum accuracy, the baseline approach remains preferable.
 
-Future work will explore adaptive compression triggers, hierarchical knowledge structures, and the relationship between model capability and optimal compression frequency.
+The Focus architecture provides a practical, complementary approach to existing memory management techniques, operating entirely within the context window without requiring external infrastructure. It demonstrates that agents can be given agency over their own memory management, opening the door to more sophisticated self-regulating systems.
+
+Future work will explore more sophisticated compression strategies that better preserve critical information, hierarchical knowledge structures, and the relationship between model capability and compression effectiveness.
 
 \bibliographystyle{IEEEtran}
 \begin{thebibliography}{10}

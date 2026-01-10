@@ -1,0 +1,402 @@
+diff --git a/src/flask/blueprints.py b/src/flask/blueprints.py
+index 5fb84d86..dcc4ecbf 100644
+--- a/src/flask/blueprints.py
++++ b/src/flask/blueprints.py
+@@ -188,355 +188,6 @@ class Blueprint(Scaffold):
+             template_folder=template_folder,
+             root_path=root_path,
+         )
+-        self.name = name
+-        self.url_prefix = url_prefix
+-        self.subdomain = subdomain
+-        self.deferred_functions: t.List[DeferredSetupFunction] = []
+-
+-        if url_defaults is None:
+-            url_defaults = {}
+-
+-        self.url_values_defaults = url_defaults
+-        self.cli_group = cli_group
+-        self._blueprints: t.List[t.Tuple["Blueprint", dict]] = []
+-
+-    def _is_setup_finished(self) -> bool:
+-        return self.warn_on_modifications and self._got_registered_once
+-
+-    def record(self, func: t.Callable) -> None:
+-        """Registers a function that is called when the blueprint is
+-        registered on the application.  This function is called with the
+-        state as argument as returned by the :meth:`make_setup_state`
+-        method.
+-        """
+-        if self._got_registered_once and self.warn_on_modifications:
+-            from warnings import warn
+-
+-            warn(
+-                Warning(
+-                    "The blueprint was already registered once but is"
+-                    " getting modified now. These changes will not show"
+-                    " up."
+-                )
+-            )
+-        self.deferred_functions.append(func)
+-
+-    def record_once(self, func: t.Callable) -> None:
+-        """Works like :meth:`record` but wraps the function in another
+-        function that will ensure the function is only called once.  If the
+-        blueprint is registered a second time on the application, the
+-        function passed is not called.
+-        """
+-
+-        def wrapper(state: BlueprintSetupState) -> None:
+-            if state.first_registration:
+-                func(state)
+-
+-        return self.record(update_wrapper(wrapper, func))
+-
+-    def make_setup_state(
+-        self, app: "Flask", options: dict, first_registration: bool = False
+-    ) -> BlueprintSetupState:
+-        """Creates an instance of :meth:`~flask.blueprints.BlueprintSetupState`
+-        object that is later passed to the register callback functions.
+-        Subclasses can override this to return a subclass of the setup state.
+-        """
+-        return BlueprintSetupState(self, app, options, first_registration)
+-
+-    def register_blueprint(self, blueprint: "Blueprint", **options: t.Any) -> None:
+-        """Register a :class:`~flask.Blueprint` on this blueprint. Keyword
+-        arguments passed to this method will override the defaults set
+-        on the blueprint.
+-
+-        .. versionadded:: 2.0
+-        """
+-        self._blueprints.append((blueprint, options))
+-
+-    def register(self, app: "Flask", options: dict) -> None:
+-        """Called by :meth:`Flask.register_blueprint` to register all
+-        views and callbacks registered on the blueprint with the
+-        application. Creates a :class:`.BlueprintSetupState` and calls
+-        each :meth:`record` callbackwith it.
+-
+-        :param app: The application this blueprint is being registered
+-            with.
+-        :param options: Keyword arguments forwarded from
+-            :meth:`~Flask.register_blueprint`.
+-        :param first_registration: Whether this is the first time this
+-            blueprint has been registered on the application.
+-        """
+-        first_registration = False
+-
+-        if self.name in app.blueprints:
+-            assert app.blueprints[self.name] is self, (
+-                "A name collision occurred between blueprints"
+-                f" {self!r} and {app.blueprints[self.name]!r}."
+-                f" Both share the same name {self.name!r}."
+-                f" Blueprints that are created on the fly need unique"
+-                f" names."
+-            )
+-        else:
+-            app.blueprints[self.name] = self
+-            first_registration = True
+-
+-        self._got_registered_once = True
+-        state = self.make_setup_state(app, options, first_registration)
+-
+-        if self.has_static_folder:
+-            state.add_url_rule(
+-                f"{self.static_url_path}/<path:filename>",
+-                view_func=self.send_static_file,
+-                endpoint="static",
+-            )
+-
+-        # Merge blueprint data into parent.
+-        if first_registration:
+-
+-            def extend(bp_dict, parent_dict):
+-                for key, values in bp_dict.items():
+-                    key = self.name if key is None else f"{self.name}.{key}"
+-
+-                    parent_dict[key].extend(values)
+-
+-            for key, value in self.error_handler_spec.items():
+-                key = self.name if key is None else f"{self.name}.{key}"
+-                value = defaultdict(
+-                    dict,
+-                    {
+-                        code: {
+-                            exc_class: func for exc_class, func in code_values.items()
+-                        }
+-                        for code, code_values in value.items()
+-                    },
+-                )
+-                app.error_handler_spec[key] = value
+-
+-            for endpoint, func in self.view_functions.items():
+-                app.view_functions[endpoint] = func
+-
+-            extend(self.before_request_funcs, app.before_request_funcs)
+-            extend(self.after_request_funcs, app.after_request_funcs)
+-            extend(
+-                self.teardown_request_funcs,
+-                app.teardown_request_funcs,
+-            )
+-            extend(self.url_default_functions, app.url_default_functions)
+-            extend(self.url_value_preprocessors, app.url_value_preprocessors)
+-            extend(self.template_context_processors, app.template_context_processors)
+-
+-        for deferred in self.deferred_functions:
+-            deferred(state)
+-
+-        cli_resolved_group = options.get("cli_group", self.cli_group)
+-
+-        if self.cli.commands:
+-            if cli_resolved_group is None:
+-                app.cli.commands.update(self.cli.commands)
+-            elif cli_resolved_group is _sentinel:
+-                self.cli.name = self.name
+-                app.cli.add_command(self.cli)
+-            else:
+-                self.cli.name = cli_resolved_group
+-                app.cli.add_command(self.cli)
+-
+-        for blueprint, bp_options in self._blueprints:
+-            url_prefix = options.get("url_prefix", "")
+-            if "url_prefix" in bp_options:
+-                url_prefix = (
+-                    url_prefix.rstrip("/") + "/" + bp_options["url_prefix"].lstrip("/")
+-                )
+-
+-            bp_options["url_prefix"] = url_prefix
+-            bp_options["name_prefix"] = options.get("name_prefix", "") + self.name + "."
+-            blueprint.register(app, bp_options)
+-
+-    def add_url_rule(
+-        self,
+-        rule: str,
+-        endpoint: t.Optional[str] = None,
+-        view_func: t.Optional[t.Callable] = None,
+-        **options: t.Any,
+-    ) -> None:
+-        """Like :meth:`Flask.add_url_rule` but for a blueprint.  The endpoint for
+-        the :func:`url_for` function is prefixed with the name of the blueprint.
+-        """
+-        if endpoint:
+-            assert "." not in endpoint, "Blueprint endpoints should not contain dots"
+-        if view_func and hasattr(view_func, "__name__"):
+-            assert (
+-                "." not in view_func.__name__
+-            ), "Blueprint view function name should not contain dots"
+-        self.record(lambda s: s.add_url_rule(rule, endpoint, view_func, **options))
+-
+-    def app_template_filter(self, name: t.Optional[str] = None) -> t.Callable:
+-        """Register a custom template filter, available application wide.  Like
+-        :meth:`Flask.template_filter` but for a blueprint.
+-
+-        :param name: the optional name of the filter, otherwise the
+-                     function name will be used.
+-        """
+-
+-        def decorator(f: TemplateFilterCallable) -> TemplateFilterCallable:
+-            self.add_app_template_filter(f, name=name)
+-            return f
+-
+-        return decorator
+-
+-    def add_app_template_filter(
+-        self, f: TemplateFilterCallable, name: t.Optional[str] = None
+-    ) -> None:
+-        """Register a custom template filter, available application wide.  Like
+-        :meth:`Flask.add_template_filter` but for a blueprint.  Works exactly
+-        like the :meth:`app_template_filter` decorator.
+-
+-        :param name: the optional name of the filter, otherwise the
+-                     function name will be used.
+-        """
+-
+-        def register_template(state: BlueprintSetupState) -> None:
+-            state.app.jinja_env.filters[name or f.__name__] = f
+-
+-        self.record_once(register_template)
+-
+-    def app_template_test(self, name: t.Optional[str] = None) -> t.Callable:
+-        """Register a custom template test, available application wide.  Like
+-        :meth:`Flask.template_test` but for a blueprint.
+-
+-        .. versionadded:: 0.10
+-
+-        :param name: the optional name of the test, otherwise the
+-                     function name will be used.
+-        """
+-
+-        def decorator(f: TemplateTestCallable) -> TemplateTestCallable:
+-            self.add_app_template_test(f, name=name)
+-            return f
+-
+-        return decorator
+-
+-    def add_app_template_test(
+-        self, f: TemplateTestCallable, name: t.Optional[str] = None
+-    ) -> None:
+-        """Register a custom template test, available application wide.  Like
+-        :meth:`Flask.add_template_test` but for a blueprint.  Works exactly
+-        like the :meth:`app_template_test` decorator.
+-
+-        .. versionadded:: 0.10
+-
+-        :param name: the optional name of the test, otherwise the
+-                     function name will be used.
+-        """
+-
+-        def register_template(state: BlueprintSetupState) -> None:
+-            state.app.jinja_env.tests[name or f.__name__] = f
+-
+-        self.record_once(register_template)
+-
+-    def app_template_global(self, name: t.Optional[str] = None) -> t.Callable:
+-        """Register a custom template global, available application wide.  Like
+-        :meth:`Flask.template_global` but for a blueprint.
+-
+-        .. versionadded:: 0.10
+-
+-        :param name: the optional name of the global, otherwise the
+-                     function name will be used.
+-        """
+-
+-        def decorator(f: TemplateGlobalCallable) -> TemplateGlobalCallable:
+-            self.add_app_template_global(f, name=name)
+-            return f
+-
+-        return decorator
+-
+-    def add_app_template_global(
+-        self, f: TemplateGlobalCallable, name: t.Optional[str] = None
+-    ) -> None:
+-        """Register a custom template global, available application wide.  Like
+-        :meth:`Flask.add_template_global` but for a blueprint.  Works exactly
+-        like the :meth:`app_template_global` decorator.
+-
+-        .. versionadded:: 0.10
+-
+-        :param name: the optional name of the global, otherwise the
+-                     function name will be used.
+-        """
+-
+-        def register_template(state: BlueprintSetupState) -> None:
+-            state.app.jinja_env.globals[name or f.__name__] = f
+-
+-        self.record_once(register_template)
+-
+-    def before_app_request(self, f: BeforeRequestCallable) -> BeforeRequestCallable:
+-        """Like :meth:`Flask.before_request`.  Such a function is executed
+-        before each request, even if outside of a blueprint.
+-        """
+-        self.record_once(
+-            lambda s: s.app.before_request_funcs.setdefault(None, []).append(f)
+-        )
+-        return f
+-
+-    def before_app_first_request(
+-        self, f: BeforeRequestCallable
+-    ) -> BeforeRequestCallable:
+-        """Like :meth:`Flask.before_first_request`.  Such a function is
+-        executed before the first request to the application.
+-        """
+-        self.record_once(lambda s: s.app.before_first_request_funcs.append(f))
+-        return f
+-
+-    def after_app_request(self, f: AfterRequestCallable) -> AfterRequestCallable:
+-        """Like :meth:`Flask.after_request` but for a blueprint.  Such a function
+-        is executed after each request, even if outside of the blueprint.
+-        """
+-        self.record_once(
+-            lambda s: s.app.after_request_funcs.setdefault(None, []).append(f)
+-        )
+-        return f
+-
+-    def teardown_app_request(self, f: TeardownCallable) -> TeardownCallable:
+-        """Like :meth:`Flask.teardown_request` but for a blueprint.  Such a
+-        function is executed when tearing down each request, even if outside of
+-        the blueprint.
+-        """
+-        self.record_once(
+-            lambda s: s.app.teardown_request_funcs.setdefault(None, []).append(f)
+-        )
+-        return f
+-
+-    def app_context_processor(
+-        self, f: TemplateContextProcessorCallable
+-    ) -> TemplateContextProcessorCallable:
+-        """Like :meth:`Flask.context_processor` but for a blueprint.  Such a
+-        function is executed each request, even if outside of the blueprint.
+-        """
+-        self.record_once(
+-            lambda s: s.app.template_context_processors.setdefault(None, []).append(f)
+-        )
+-        return f
+-
+-    def app_errorhandler(self, code: t.Union[t.Type[Exception], int]) -> t.Callable:
+-        """Like :meth:`Flask.errorhandler` but for a blueprint.  This
+-        handler is used for all requests, even if outside of the blueprint.
+-        """
+-
+-        def decorator(f: ErrorHandlerCallable) -> ErrorHandlerCallable:
+-            self.record_once(lambda s: s.app.errorhandler(code)(f))
+-            return f
+-
+-        return decorator
+-
+-    def app_url_value_preprocessor(
+-        self, f: URLValuePreprocessorCallable
+-    ) -> URLValuePreprocessorCallable:
+-        """Same as :meth:`url_value_preprocessor` but application wide."""
+-        self.record_once(
+-            lambda s: s.app.url_value_preprocessors.setdefault(None, []).append(f)
+-        )
+-        return f
+-
+-    def app_url_defaults(self, f: URLDefaultCallable) -> URLDefaultCallable:
+-        """Same as :meth:`url_defaults` but application wide."""
+-        self.record_once(
+-            lambda s: s.app.url_default_functions.setdefault(None, []).append(f)
+-        )
+-        return f
++        if "." in name:
++            raise ValueError("Blueprint names cannot contain dots.")
++        self.name = name
+\ No newline at end of file
+diff --git a/tests/test_blueprints.py b/tests/test_blueprints.py
+index b986ca02..fb0cf18a 100644
+--- a/tests/test_blueprints.py
++++ b/tests/test_blueprints.py
+@@ -254,27 +254,12 @@ def test_templates_list(test_apps):
+ 
+ 
+ def test_dotted_names(app, client):
+-    frontend = flask.Blueprint("myapp.frontend", __name__)
+-    backend = flask.Blueprint("myapp.backend", __name__)
+-
+-    @frontend.route("/fe")
+-    def frontend_index():
+-        return flask.url_for("myapp.backend.backend_index")
+-
+-    @frontend.route("/fe2")
+-    def frontend_page2():
+-        return flask.url_for(".frontend_index")
+-
+-    @backend.route("/be")
+-    def backend_index():
+-        return flask.url_for("myapp.frontend.frontend_index")
+-
+-    app.register_blueprint(frontend)
+-    app.register_blueprint(backend)
+-
+-    assert client.get("/fe").data.strip() == b"/be"
+-    assert client.get("/fe2").data.strip() == b"/fe"
+-    assert client.get("/be").data.strip() == b"/fe"
++    # Blueprint names cannot contain dots
++    with pytest.raises(ValueError, match="Blueprint names cannot contain dots"):
++        flask.Blueprint("myapp.frontend", __name__)
++    
++    with pytest.raises(ValueError, match="Blueprint names cannot contain dots"):
++        flask.Blueprint("myapp.backend", __name__)
+ 
+ 
+ def test_dotted_names_from_app(app, client):
