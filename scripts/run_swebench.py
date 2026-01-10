@@ -93,7 +93,6 @@ async def run_agent_for_patch(
     model: str,
     provider: str,
     max_steps: int = DEFAULT_MAX_STEPS,
-    steps_per_focus: int = DEFAULT_STEPS_PER_FOCUS,
 ) -> tuple[str, dict, str | None]:
     """Run agent and extract the patch (git diff) it produces."""
     workspace = Path(tempfile.mkdtemp(prefix=f"swebench_{instance.instance_id}_"))
@@ -118,8 +117,6 @@ async def run_agent_for_patch(
                 tools=tools,
                 provider=provider,
                 max_steps=max_steps,
-                auto_focus=True,
-                steps_per_focus=steps_per_focus,
                 console=Console(quiet=True),
             )
         
@@ -148,12 +145,10 @@ async def run_agent_for_patch(
         shutil.rmtree(workspace, ignore_errors=True)
 
 
-def run_agent_sync(args, steps_per_focus=DEFAULT_STEPS_PER_FOCUS):
+def run_agent_sync(args):
     """Synchronous wrapper for async agent run."""
     agent_type, instance, model, provider, max_steps = args
-    # Pass steps_per_focus via args mechanism or global?
-    # Better to unpack and call
-    return asyncio.run(run_agent_for_patch(agent_type, instance, model, provider, max_steps, steps_per_focus))
+    return asyncio.run(run_agent_for_patch(agent_type, instance, model, provider, max_steps))
 
 
 async def main():
@@ -238,7 +233,7 @@ Examples:
         
         with ThreadPoolExecutor(max_workers=args.max_workers) as executor:
             future_to_task = {
-                executor.submit(run_agent_sync, task, args.steps_per_focus): task 
+                executor.submit(run_agent_sync, task): task 
                 for task in tasks
             }
             

@@ -53,8 +53,6 @@ class FocusAgent(BaselineAgent):
         max_steps: int = 50,
         temperature: float = 0.0,
         provider: str = "anthropic",
-        auto_focus: bool = True,  # Automatically manage focuses
-        steps_per_focus: int = 15,  # Auto-complete focus after N steps
         console: Console | None = None,  # For logging focus events
     ):
         # Add focus tools
@@ -66,9 +64,6 @@ class FocusAgent(BaselineAgent):
         # Focus state
         self._focus_stack: list[FocusState] = []
         self._knowledge: list[KnowledgeEntry] = []
-        self._auto_focus = auto_focus
-        self._steps_per_focus = steps_per_focus
-        self._steps_in_current_focus = 0
         self._console = console or Console()
 
     def reset(self) -> None:
@@ -76,7 +71,6 @@ class FocusAgent(BaselineAgent):
         super().reset()
         self._focus_stack = []
         self._knowledge = []
-        self._steps_in_current_focus = 0
 
     def _build_knowledge_section(self) -> str:
         """Build the persistent knowledge section from accumulated learnings."""
@@ -166,19 +160,7 @@ When you're done with the entire task, respond with TASK_COMPLETE and a summary 
         self._add_message(Message(role=MessageRole.SYSTEM, content=system_prompt))
         self._add_message(Message(role=MessageRole.USER, content=task))
 
-        # Auto-start first focus if enabled
-        if self._auto_focus:
-            self._auto_start_focus(
-                "Initial exploration", "Understand the problem and find relevant code"
-            )
-
         for step in range(self.max_steps):
-            self._steps_in_current_focus += 1
-
-            # Check if we should auto-complete focus (before LLM call)
-            if self._auto_focus and self._should_auto_complete_focus():
-                await self._auto_complete_focus()
-
             # Call LLM
             response = await self._call_llm(self.messages)
             self._add_message(response)
@@ -207,7 +189,6 @@ When you're done with the entire task, respond with TASK_COMPLETE and a summary 
                     # continuation message. Don't add tool result - skip to next step.
                     if result.is_compression:
                         focus_completed = True
-                        self._steps_in_current_focus = 0
                         break
 
                     self._add_message(
@@ -401,37 +382,7 @@ Your learnings have been saved to the KNOWLEDGE section above.
         # Fallback to minimum
         return min_safe
 
-    def _should_auto_complete_focus(self) -> bool:
-        """Check if we should auto-complete the current focus."""
-        if not self._focus_stack:
-            return False
-        
-        # If steps_per_focus is None or 0, we rely on the model to decide (Model Triggered)
-        if not self._steps_per_focus:
-            return False
-            
-        return self._steps_in_current_focus >= self._steps_per_focus
 
-    def _auto_start_focus(self, description: str, goal: str) -> None:
-        """Programmatically start a focus."""
-        self._handle_start_focus(description, goal)
-        self._steps_in_current_focus = 0
-
-    async def _auto_complete_focus(self) -> None:
-        """Trigger the agent to complete the focus itself."""
-        if not self._focus_stack:
-            return
-
-        # Instead of doing the work for the agent, we just tell it to do it.
-        # This avoids paying double token cost for a separate summarization call.
-        nudge = Message(
-            role=MessageRole.USER, 
-            content="[SYSTEM] You have been working on this focus for a while. Please consolidate your progress by calling the `complete_focus` tool now. Summarize your key findings and decide on the next steps."
-        )
-        self._add_message(nudge)
-        
-        # Reset the counter so we don't nag it every single step if it takes a moment
-        self._steps_in_current_focus = 0
 
     async def _extract_learnings_from_messages(self) -> str:
         # This method is no longer used in the new flow but kept for compatibility
