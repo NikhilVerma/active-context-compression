@@ -7,9 +7,9 @@
 
 ## 📄 Paper
 
-*Active Context Compression: Autonomous Memory Management in LLM Agents*
+**[Active Context Compression: Autonomous Memory Management in LLM Agents](paper.pdf)**
 
-See `paper.tex` for the full technical details.
+Read the paper: [paper.pdf](paper.pdf) | [LaTeX source](paper.tex)
 
 ## 🚀 Key Features
 
