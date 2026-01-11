@@ -1,0 +1,153 @@
+warning: `VIRTUAL_ENV=/Users/nikhilverma/.venv` does not match the project environment path `.venv` and will be ignored; use `--active` to target the active environment instead
+Loading SWE-bench Lite dataset...
+Running 5 instances with claude-sonnet-4-5-20250929
+Max workers: 2
+
+Phase 1: Generating patches (10 runs)...
+Task exception was never retrieved
+future: <Task finished name='Task-587' coro=<AsyncClient.aclose() done, defined at /Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpx/_client.py:1978> exception=RuntimeError('Event loop is closed')>
+Traceback (most recent call last):
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpx/_client.py", line 1985, in aclose
+    await self._transport.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpx/_transports/default.py", line 406, in aclose
+    await self._pool.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/connection_pool.py", line 353, in aclose
+    await self._close_connections(closing_connections)
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/connection_pool.py", line 345, in _close_connections
+    await connection.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/connection.py", line 173, in aclose
+    await self._connection.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/http11.py", line 258, in aclose
+    await self._network_stream.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_backends/anyio.py", line 53, in aclose
+    await self._stream.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/anyio/streams/tls.py", line 241, in aclose
+    await self.transport_stream.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 1352, in aclose
+    self._transport.close()
+  File "/Users/nikhilverma/.local/share/uv/python/cpython-3.11.10-macos-aarch64-none/lib/python3.11/asyncio/selector_events.py", line 864, in close
+    self._loop.call_soon(self._call_connection_lost, None)
+  File "/Users/nikhilverma/.local/share/uv/python/cpython-3.11.10-macos-aarch64-none/lib/python3.11/asyncio/base_events.py", line 762, in call_soon
+    self._check_closed()
+  File "/Users/nikhilverma/.local/share/uv/python/cpython-3.11.10-macos-aarch64-none/lib/python3.11/asyncio/base_events.py", line 520, in _check_closed
+    raise RuntimeError('Event loop is closed')
+RuntimeError: Event loop is closed
+Task exception was never retrieved
+future: <Task finished name='Task-588' coro=<AsyncClient.aclose() done, defined at /Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpx/_client.py:1978> exception=RuntimeError('Event loop is closed')>
+Traceback (most recent call last):
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpx/_client.py", line 1985, in aclose
+    await self._transport.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpx/_transports/default.py", line 406, in aclose
+    await self._pool.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/connection_pool.py", line 353, in aclose
+    await self._close_connections(closing_connections)
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/connection_pool.py", line 345, in _close_connections
+    await connection.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/connection.py", line 173, in aclose
+    await self._connection.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/http11.py", line 258, in aclose
+    await self._network_stream.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_backends/anyio.py", line 53, in aclose
+    await self._stream.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/anyio/streams/tls.py", line 241, in aclose
+    await self.transport_stream.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 1352, in aclose
+    self._transport.close()
+  File "/Users/nikhilverma/.local/share/uv/python/cpython-3.11.10-macos-aarch64-none/lib/python3.11/asyncio/selector_events.py", line 864, in close
+    self._loop.call_soon(self._call_connection_lost, None)
+  File "/Users/nikhilverma/.local/share/uv/python/cpython-3.11.10-macos-aarch64-none/lib/python3.11/asyncio/base_events.py", line 762, in call_soon
+    self._check_closed()
+  File "/Users/nikhilverma/.local/share/uv/python/cpython-3.11.10-macos-aarch64-none/lib/python3.11/asyncio/base_events.py", line 520, in _check_closed
+    raise RuntimeError('Event loop is closed')
+RuntimeError: Event loop is closed
+   scikit-learn__scikit-learn-102 ✓ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100%
+Saved predictions to 
+results/definitive_comparison_v2/predictions_baseline_20260110_064331.json
+Saved predictions to 
+results/definitive_comparison_v2/predictions_focus_20260110_064331.json
+Saved metrics to 
+results/definitive_comparison_v2/swebench_lite_claude-sonnet-4-5-20250929_2026-0
+1-10T05-57-42.735398.json
+
+Phase 2: Running official SWE-bench evaluation...
+Docker socket: /Users/nikhilverma/.orbstack/run/docker.sock
+
+Evaluating baseline agent...
+<frozen runpy>:128: RuntimeWarning: 'swebench.harness.run_evaluation' found in sys.modules after import of package 'swebench.harness', but prior to execution of 'swebench.harness.run_evaluation'; this may result in unpredictable behaviour
+2026-01-10 06:43:32,939 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+2026-01-10 06:43:32,952 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/datasets/princeton-nlp/SWE-bench_Lite/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/README.md "HTTP/1.1 200 OK"
+2026-01-10 06:43:33,163 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite/resolve/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/SWE-bench_Lite.py "HTTP/1.1 404 Not Found"
+2026-01-10 06:43:33,826 - httpx - INFO - HTTP Request: HEAD https://s3.amazonaws.com/datasets.huggingface.co/datasets/datasets/princeton-nlp/SWE-bench_Lite/princeton-nlp/SWE-bench_Lite.py "HTTP/1.1 404 Not Found"
+2026-01-10 06:43:34,044 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/datasets/princeton-nlp/SWE-bench_Lite/revision/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2 "HTTP/1.1 200 OK"
+2026-01-10 06:43:34,255 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite/resolve/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/.huggingface.yaml "HTTP/1.1 404 Not Found"
+2026-01-10 06:43:34,525 - httpx - INFO - HTTP Request: GET https://datasets-server.huggingface.co/info?dataset=princeton-nlp/SWE-bench_Lite "HTTP/1.1 200 OK"
+2026-01-10 06:43:34,741 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/datasets/princeton-nlp/SWE-bench_Lite/tree/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/data?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-01-10 06:43:34,955 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/datasets/princeton-nlp/SWE-bench_Lite/tree/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2?recursive=false&expand=false "HTTP/1.1 200 OK"
+2026-01-10 06:43:35,187 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite/resolve/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/dataset_infos.json "HTTP/1.1 404 Not Found"
+2026-01-10 06:43:35,461 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+2026-01-10 06:43:35,473 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/datasets/princeton-nlp/SWE-bench_Lite/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/README.md "HTTP/1.1 200 OK"
+2026-01-10 06:43:35,768 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite/resolve/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/SWE-bench_Lite.py "HTTP/1.1 404 Not Found"
+2026-01-10 06:43:35,984 - httpx - INFO - HTTP Request: HEAD https://s3.amazonaws.com/datasets.huggingface.co/datasets/datasets/princeton-nlp/SWE-bench_Lite/princeton-nlp/SWE-bench_Lite.py "HTTP/1.1 404 Not Found"
+2026-01-10 06:43:36,200 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite/resolve/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/.huggingface.yaml "HTTP/1.1 404 Not Found"
+2026-01-10 06:43:36,421 - httpx - INFO - HTTP Request: GET https://datasets-server.huggingface.co/info?dataset=princeton-nlp/SWE-bench_Lite "HTTP/1.1 200 OK"
+2026-01-10 06:43:36,633 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite/resolve/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/dataset_infos.json "HTTP/1.1 404 Not Found"
+Running 5 instances...
+Evaluation:   0%|          | 0/5 [00:00<?, ?it/s, error=0, ✓=0, ✖=0]Evaluation:   0%|          | 0/5 [03:06<?, ?it/s, ✓=0, ✖=1, error=0]Evaluation:  20%|██        | 1/5 [03:06<12:24, 186.12s/it, ✓=0, ✖=1, error=0]Evaluation:  20%|██        | 1/5 [03:27<12:24, 186.12s/it, ✓=0, ✖=2, error=0]Evaluation:  40%|████      | 2/5 [03:27<04:28, 89.50s/it, ✓=0, ✖=2, error=0] Evaluation:  40%|████      | 2/5 [04:53<04:28, 89.50s/it, ✓=1, ✖=2, error=0]Evaluation:  60%|██████    | 3/5 [04:53<02:55, 87.56s/it, ✓=1, ✖=2, error=0]Evaluation:  60%|██████    | 3/5 [05:34<02:55, 87.56s/it, ✓=2, ✖=2, error=0]Evaluation:  80%|████████  | 4/5 [05:34<01:09, 69.40s/it, ✓=2, ✖=2, error=0]Evaluation:  80%|████████  | 4/5 [08:07<01:09, 69.40s/it, ✓=3, ✖=2, error=0]Evaluation: 100%|██████████| 5/5 [08:07<00:00, 99.28s/it, ✓=3, ✖=2, error=0]Evaluation: 100%|██████████| 5/5 [08:07<00:00, 97.41s/it, ✓=3, ✖=2, error=0]
+All instances run.
+Cleaning cached images...
+Removed 0 images.
+Total instances: 300
+Instances submitted: 5
+Instances completed: 5
+Instances incomplete: 295
+Instances resolved: 3
+Instances unresolved: 2
+Instances with empty patches: 0
+Instances with errors: 0
+Unstopped containers: 0
+Unremoved images: 0
+Report written to claude-sonnet-4-5-20250929_baseline.baseline_20260110_064331.json
+
+Evaluating focus agent...
+<frozen runpy>:128: RuntimeWarning: 'swebench.harness.run_evaluation' found in sys.modules after import of package 'swebench.harness', but prior to execution of 'swebench.harness.run_evaluation'; this may result in unpredictable behaviour
+2026-01-10 06:51:56,498 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+2026-01-10 06:51:56,512 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/datasets/princeton-nlp/SWE-bench_Lite/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/README.md "HTTP/1.1 200 OK"
+2026-01-10 06:51:56,723 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite/resolve/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/SWE-bench_Lite.py "HTTP/1.1 404 Not Found"
+2026-01-10 06:51:57,762 - httpx - INFO - HTTP Request: HEAD https://s3.amazonaws.com/datasets.huggingface.co/datasets/datasets/princeton-nlp/SWE-bench_Lite/princeton-nlp/SWE-bench_Lite.py "HTTP/1.1 404 Not Found"
+2026-01-10 06:51:57,983 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/datasets/princeton-nlp/SWE-bench_Lite/revision/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2 "HTTP/1.1 200 OK"
+2026-01-10 06:51:58,191 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite/resolve/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/.huggingface.yaml "HTTP/1.1 404 Not Found"
+2026-01-10 06:51:58,491 - httpx - INFO - HTTP Request: GET https://datasets-server.huggingface.co/info?dataset=princeton-nlp/SWE-bench_Lite "HTTP/1.1 200 OK"
+2026-01-10 06:51:58,799 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/datasets/princeton-nlp/SWE-bench_Lite/tree/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/data?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-01-10 06:51:59,102 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/datasets/princeton-nlp/SWE-bench_Lite/tree/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2?recursive=false&expand=false "HTTP/1.1 200 OK"
+2026-01-10 06:51:59,332 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite/resolve/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/dataset_infos.json "HTTP/1.1 404 Not Found"
+2026-01-10 06:51:59,612 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+2026-01-10 06:51:59,628 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/datasets/princeton-nlp/SWE-bench_Lite/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/README.md "HTTP/1.1 200 OK"
+2026-01-10 06:51:59,843 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite/resolve/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/SWE-bench_Lite.py "HTTP/1.1 404 Not Found"
+2026-01-10 06:52:00,064 - httpx - INFO - HTTP Request: HEAD https://s3.amazonaws.com/datasets.huggingface.co/datasets/datasets/princeton-nlp/SWE-bench_Lite/princeton-nlp/SWE-bench_Lite.py "HTTP/1.1 404 Not Found"
+2026-01-10 06:52:00,323 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite/resolve/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/.huggingface.yaml "HTTP/1.1 404 Not Found"
+2026-01-10 06:52:01,041 - httpx - INFO - HTTP Request: GET https://datasets-server.huggingface.co/info?dataset=princeton-nlp/SWE-bench_Lite "HTTP/1.1 200 OK"
+2026-01-10 06:52:01,260 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite/resolve/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/dataset_infos.json "HTTP/1.1 404 Not Found"
+Running 5 instances...
+Evaluation:   0%|          | 0/5 [00:00<?, ?it/s, error=0, ✓=0, ✖=0]Evaluation:   0%|          | 0/5 [03:22<?, ?it/s, ✓=0, ✖=1, error=0]Evaluation:  20%|██        | 1/5 [03:22<13:29, 202.49s/it, ✓=0, ✖=1, error=0]Evaluation:  20%|██        | 1/5 [03:42<13:29, 202.49s/it, ✓=0, ✖=2, error=0]Evaluation:  40%|████      | 2/5 [03:42<04:44, 94.91s/it, ✓=0, ✖=2, error=0] Evaluation:  40%|████      | 2/5 [05:18<04:44, 94.91s/it, ✓=1, ✖=2, error=0]Evaluation:  60%|██████    | 3/5 [05:18<03:11, 95.70s/it, ✓=1, ✖=2, error=0]Evaluation:  60%|██████    | 3/5 [05:48<03:11, 95.70s/it, ✓=1, ✖=3, error=0]Evaluation:  80%|████████  | 4/5 [05:48<01:09, 69.68s/it, ✓=1, ✖=3, error=0]Evaluation:  80%|████████  | 4/5 [08:26<01:09, 69.68s/it, ✓=2, ✖=3, error=0]Evaluation: 100%|██████████| 5/5 [08:26<00:00, 101.60s/it, ✓=2, ✖=3, error=0]Evaluation: 100%|██████████| 5/5 [08:26<00:00, 101.34s/it, ✓=2, ✖=3, error=0]
+All instances run.
+Cleaning cached images...
+Removed 0 images.
+Total instances: 300
+Instances submitted: 5
+Instances completed: 5
+Instances incomplete: 295
+Instances resolved: 2
+Instances unresolved: 3
+Instances with empty patches: 0
+Instances with errors: 0
+Unstopped containers: 0
+Unremoved images: 0
+Report written to claude-sonnet-4-5-20250929_focus.focus_20260110_064331.json
+
+Evaluation Summary:
+  baseline: ✓
+  focus: ✓
+
+Results saved in: logs/run_evaluation/20260110_064331/
+
+Done!

@@ -1,0 +1,349 @@
+warning: `VIRTUAL_ENV=/Users/nikhilverma/.venv` does not match the project environment path `.venv` and will be ignored; use `--active` to target the active environment instead
+Loading SWE-bench Lite dataset...
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Running 10 instances with claude-haiku-4-5-20251001
+Max workers: 4
+
+Phase 1: Generating patches (20 runs)...
+Task exception was never retrieved
+future: <Task finished name='Task-877' coro=<AsyncClient.aclose() done, defined at /Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpx/_client.py:1978> exception=RuntimeError('Event loop is closed')>
+Traceback (most recent call last):
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpx/_client.py", line 1985, in aclose
+    await self._transport.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpx/_transports/default.py", line 406, in aclose
+    await self._pool.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/connection_pool.py", line 353, in aclose
+    await self._close_connections(closing_connections)
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/connection_pool.py", line 345, in _close_connections
+    await connection.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/connection.py", line 173, in aclose
+    await self._connection.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/http11.py", line 258, in aclose
+    await self._network_stream.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_backends/anyio.py", line 53, in aclose
+    await self._stream.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/anyio/streams/tls.py", line 241, in aclose
+    await self.transport_stream.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 1352, in aclose
+    self._transport.close()
+  File "/Users/nikhilverma/.local/share/uv/python/cpython-3.11.10-macos-aarch64-none/lib/python3.11/asyncio/selector_events.py", line 864, in close
+    self._loop.call_soon(self._call_connection_lost, None)
+  File "/Users/nikhilverma/.local/share/uv/python/cpython-3.11.10-macos-aarch64-none/lib/python3.11/asyncio/base_events.py", line 762, in call_soon
+    self._check_closed()
+  File "/Users/nikhilverma/.local/share/uv/python/cpython-3.11.10-macos-aarch64-none/lib/python3.11/asyncio/base_events.py", line 520, in _check_closed
+    raise RuntimeError('Event loop is closed')
+RuntimeError: Event loop is closed
+Task exception was never retrieved
+future: <Task finished name='Task-878' coro=<AsyncClient.aclose() done, defined at /Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpx/_client.py:1978> exception=RuntimeError('Event loop is closed')>
+Traceback (most recent call last):
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpx/_client.py", line 1985, in aclose
+    await self._transport.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpx/_transports/default.py", line 406, in aclose
+    await self._pool.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/connection_pool.py", line 353, in aclose
+    await self._close_connections(closing_connections)
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/connection_pool.py", line 345, in _close_connections
+    await connection.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/connection.py", line 173, in aclose
+    await self._connection.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/http11.py", line 258, in aclose
+    await self._network_stream.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_backends/anyio.py", line 53, in aclose
+    await self._stream.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/anyio/streams/tls.py", line 241, in aclose
+    await self.transport_stream.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 1352, in aclose
+    self._transport.close()
+  File "/Users/nikhilverma/.local/share/uv/python/cpython-3.11.10-macos-aarch64-none/lib/python3.11/asyncio/selector_events.py", line 864, in close
+    self._loop.call_soon(self._call_connection_lost, None)
+  File "/Users/nikhilverma/.local/share/uv/python/cpython-3.11.10-macos-aarch64-none/lib/python3.11/asyncio/base_events.py", line 762, in call_soon
+    self._check_closed()
+  File "/Users/nikhilverma/.local/share/uv/python/cpython-3.11.10-macos-aarch64-none/lib/python3.11/asyncio/base_events.py", line 520, in _check_closed
+    raise RuntimeError('Event loop is closed')
+RuntimeError: Event loop is closed
+Task exception was never retrieved
+future: <Task finished name='Task-879' coro=<AsyncClient.aclose() done, defined at /Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpx/_client.py:1978> exception=RuntimeError('Event loop is closed')>
+Traceback (most recent call last):
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpx/_client.py", line 1985, in aclose
+    await self._transport.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpx/_transports/default.py", line 406, in aclose
+    await self._pool.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/connection_pool.py", line 353, in aclose
+    await self._close_connections(closing_connections)
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/connection_pool.py", line 345, in _close_connections
+    await connection.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/connection.py", line 173, in aclose
+    await self._connection.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/http11.py", line 258, in aclose
+    await self._network_stream.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_backends/anyio.py", line 53, in aclose
+    await self._stream.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/anyio/streams/tls.py", line 241, in aclose
+    await self.transport_stream.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 1352, in aclose
+    self._transport.close()
+  File "/Users/nikhilverma/.local/share/uv/python/cpython-3.11.10-macos-aarch64-none/lib/python3.11/asyncio/selector_events.py", line 864, in close
+    self._loop.call_soon(self._call_connection_lost, None)
+  File "/Users/nikhilverma/.local/share/uv/python/cpython-3.11.10-macos-aarch64-none/lib/python3.11/asyncio/base_events.py", line 762, in call_soon
+    self._check_closed()
+  File "/Users/nikhilverma/.local/share/uv/python/cpython-3.11.10-macos-aarch64-none/lib/python3.11/asyncio/base_events.py", line 520, in _check_closed
+    raise RuntimeError('Event loop is closed')
+RuntimeError: Event loop is closed
+Task exception was never retrieved
+future: <Task finished name='Task-880' coro=<AsyncClient.aclose() done, defined at /Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpx/_client.py:1978> exception=RuntimeError('Event loop is closed')>
+Traceback (most recent call last):
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpx/_client.py", line 1985, in aclose
+    await self._transport.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpx/_transports/default.py", line 406, in aclose
+    await self._pool.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/connection_pool.py", line 353, in aclose
+    await self._close_connections(closing_connections)
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/connection_pool.py", line 345, in _close_connections
+    await connection.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/connection.py", line 173, in aclose
+    await self._connection.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/http11.py", line 258, in aclose
+    await self._network_stream.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_backends/anyio.py", line 53, in aclose
+    await self._stream.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/anyio/streams/tls.py", line 241, in aclose
+    await self.transport_stream.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 1352, in aclose
+    self._transport.close()
+  File "/Users/nikhilverma/.local/share/uv/python/cpython-3.11.10-macos-aarch64-none/lib/python3.11/asyncio/selector_events.py", line 864, in close
+    self._loop.call_soon(self._call_connection_lost, None)
+  File "/Users/nikhilverma/.local/share/uv/python/cpython-3.11.10-macos-aarch64-none/lib/python3.11/asyncio/base_events.py", line 762, in call_soon
+    self._check_closed()
+  File "/Users/nikhilverma/.local/share/uv/python/cpython-3.11.10-macos-aarch64-none/lib/python3.11/asyncio/base_events.py", line 520, in _check_closed
+    raise RuntimeError('Event loop is closed')
+RuntimeError: Event loop is closed
+Task exception was never retrieved
+future: <Task finished name='Task-881' coro=<AsyncClient.aclose() done, defined at /Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpx/_client.py:1978> exception=RuntimeError('Event loop is closed')>
+Traceback (most recent call last):
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpx/_client.py", line 1985, in aclose
+    await self._transport.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpx/_transports/default.py", line 406, in aclose
+    await self._pool.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/connection_pool.py", line 353, in aclose
+    await self._close_connections(closing_connections)
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/connection_pool.py", line 345, in _close_connections
+    await connection.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/connection.py", line 173, in aclose
+    await self._connection.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/http11.py", line 258, in aclose
+    await self._network_stream.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_backends/anyio.py", line 53, in aclose
+    await self._stream.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/anyio/streams/tls.py", line 241, in aclose
+    await self.transport_stream.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 1352, in aclose
+    self._transport.close()
+  File "/Users/nikhilverma/.local/share/uv/python/cpython-3.11.10-macos-aarch64-none/lib/python3.11/asyncio/selector_events.py", line 864, in close
+    self._loop.call_soon(self._call_connection_lost, None)
+  File "/Users/nikhilverma/.local/share/uv/python/cpython-3.11.10-macos-aarch64-none/lib/python3.11/asyncio/base_events.py", line 762, in call_soon
+    self._check_closed()
+  File "/Users/nikhilverma/.local/share/uv/python/cpython-3.11.10-macos-aarch64-none/lib/python3.11/asyncio/base_events.py", line 520, in _check_closed
+    raise RuntimeError('Event loop is closed')
+RuntimeError: Event loop is closed
+Task exception was never retrieved
+future: <Task finished name='Task-882' coro=<AsyncClient.aclose() done, defined at /Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpx/_client.py:1978> exception=RuntimeError('Event loop is closed')>
+Traceback (most recent call last):
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpx/_client.py", line 1985, in aclose
+    await self._transport.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpx/_transports/default.py", line 406, in aclose
+    await self._pool.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/connection_pool.py", line 353, in aclose
+    await self._close_connections(closing_connections)
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/connection_pool.py", line 345, in _close_connections
+    await connection.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/connection.py", line 173, in aclose
+    await self._connection.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/http11.py", line 258, in aclose
+    await self._network_stream.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_backends/anyio.py", line 53, in aclose
+    await self._stream.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/anyio/streams/tls.py", line 241, in aclose
+    await self.transport_stream.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 1352, in aclose
+    self._transport.close()
+  File "/Users/nikhilverma/.local/share/uv/python/cpython-3.11.10-macos-aarch64-none/lib/python3.11/asyncio/selector_events.py", line 864, in close
+    self._loop.call_soon(self._call_connection_lost, None)
+  File "/Users/nikhilverma/.local/share/uv/python/cpython-3.11.10-macos-aarch64-none/lib/python3.11/asyncio/base_events.py", line 762, in call_soon
+    self._check_closed()
+  File "/Users/nikhilverma/.local/share/uv/python/cpython-3.11.10-macos-aarch64-none/lib/python3.11/asyncio/base_events.py", line 520, in _check_closed
+    raise RuntimeError('Event loop is closed')
+RuntimeError: Event loop is closed
+Task exception was never retrieved
+future: <Task finished name='Task-883' coro=<AsyncClient.aclose() done, defined at /Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpx/_client.py:1978> exception=RuntimeError('Event loop is closed')>
+Traceback (most recent call last):
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpx/_client.py", line 1985, in aclose
+    await self._transport.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpx/_transports/default.py", line 406, in aclose
+    await self._pool.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/connection_pool.py", line 353, in aclose
+    await self._close_connections(closing_connections)
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/connection_pool.py", line 345, in _close_connections
+    await connection.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/connection.py", line 173, in aclose
+    await self._connection.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/http11.py", line 258, in aclose
+    await self._network_stream.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_backends/anyio.py", line 53, in aclose
+    await self._stream.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/anyio/streams/tls.py", line 241, in aclose
+    await self.transport_stream.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 1352, in aclose
+    self._transport.close()
+  File "/Users/nikhilverma/.local/share/uv/python/cpython-3.11.10-macos-aarch64-none/lib/python3.11/asyncio/selector_events.py", line 864, in close
+    self._loop.call_soon(self._call_connection_lost, None)
+  File "/Users/nikhilverma/.local/share/uv/python/cpython-3.11.10-macos-aarch64-none/lib/python3.11/asyncio/base_events.py", line 762, in call_soon
+    self._check_closed()
+  File "/Users/nikhilverma/.local/share/uv/python/cpython-3.11.10-macos-aarch64-none/lib/python3.11/asyncio/base_events.py", line 520, in _check_closed
+    raise RuntimeError('Event loop is closed')
+RuntimeError: Event loop is closed
+Task exception was never retrieved
+future: <Task finished name='Task-1299' coro=<AsyncClient.aclose() done, defined at /Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpx/_client.py:1978> exception=RuntimeError('Event loop is closed')>
+Traceback (most recent call last):
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpx/_client.py", line 1985, in aclose
+    await self._transport.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpx/_transports/default.py", line 406, in aclose
+    await self._pool.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/connection_pool.py", line 353, in aclose
+    await self._close_connections(closing_connections)
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/connection_pool.py", line 345, in _close_connections
+    await connection.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/connection.py", line 173, in aclose
+    await self._connection.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/http11.py", line 258, in aclose
+    await self._network_stream.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_backends/anyio.py", line 53, in aclose
+    await self._stream.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/anyio/streams/tls.py", line 241, in aclose
+    await self.transport_stream.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 1352, in aclose
+    self._transport.close()
+  File "/Users/nikhilverma/.local/share/uv/python/cpython-3.11.10-macos-aarch64-none/lib/python3.11/asyncio/selector_events.py", line 864, in close
+    self._loop.call_soon(self._call_connection_lost, None)
+  File "/Users/nikhilverma/.local/share/uv/python/cpython-3.11.10-macos-aarch64-none/lib/python3.11/asyncio/base_events.py", line 762, in call_soon
+    self._check_closed()
+  File "/Users/nikhilverma/.local/share/uv/python/cpython-3.11.10-macos-aarch64-none/lib/python3.11/asyncio/base_events.py", line 520, in _check_closed
+    raise RuntimeError('Event loop is closed')
+RuntimeError: Event loop is closed
+Task exception was never retrieved
+future: <Task finished name='Task-1300' coro=<AsyncClient.aclose() done, defined at /Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpx/_client.py:1978> exception=RuntimeError('Event loop is closed')>
+Traceback (most recent call last):
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpx/_client.py", line 1985, in aclose
+    await self._transport.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpx/_transports/default.py", line 406, in aclose
+    await self._pool.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/connection_pool.py", line 353, in aclose
+    await self._close_connections(closing_connections)
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/connection_pool.py", line 345, in _close_connections
+    await connection.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/connection.py", line 173, in aclose
+    await self._connection.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_async/http11.py", line 258, in aclose
+    await self._network_stream.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/httpcore/_backends/anyio.py", line 53, in aclose
+    await self._stream.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/anyio/streams/tls.py", line 241, in aclose
+    await self.transport_stream.aclose()
+  File "/Volumes/repos/time-travel-benchmark/.venv/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 1352, in aclose
+    self._transport.close()
+  File "/Users/nikhilverma/.local/share/uv/python/cpython-3.11.10-macos-aarch64-none/lib/python3.11/asyncio/selector_events.py", line 864, in close
+    self._loop.call_soon(self._call_connection_lost, None)
+  File "/Users/nikhilverma/.local/share/uv/python/cpython-3.11.10-macos-aarch64-none/lib/python3.11/asyncio/base_events.py", line 762, in call_soon
+    self._check_closed()
+  File "/Users/nikhilverma/.local/share/uv/python/cpython-3.11.10-macos-aarch64-none/lib/python3.11/asyncio/base_events.py", line 520, in _check_closed
+    raise RuntimeError('Event loop is closed')
+RuntimeError: Event loop is closed
+   django__django-12708 ✗ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100%
+Saved predictions to results/predictions_baseline_20260109_101822.json
+Saved predictions to results/predictions_focus_20260109_101822.json
+Saved metrics to 
+results/swebench_lite_claude-haiku-4-5-20251001_2026-01-09T10-05-22.849238.json
+
+Phase 2: Running official SWE-bench evaluation...
+Docker socket: /Users/nikhilverma/.orbstack/run/docker.sock
+
+Evaluating baseline agent...
+<frozen runpy>:128: RuntimeWarning: 'swebench.harness.run_evaluation' found in sys.modules after import of package 'swebench.harness', but prior to execution of 'swebench.harness.run_evaluation'; this may result in unpredictable behaviour
+2026-01-09 10:18:24,124 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+2026-01-09 10:18:24,137 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/datasets/princeton-nlp/SWE-bench_Lite/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/README.md "HTTP/1.1 200 OK"
+2026-01-09 10:18:24,346 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite/resolve/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/SWE-bench_Lite.py "HTTP/1.1 404 Not Found"
+2026-01-09 10:18:25,252 - httpx - INFO - HTTP Request: HEAD https://s3.amazonaws.com/datasets.huggingface.co/datasets/datasets/princeton-nlp/SWE-bench_Lite/princeton-nlp/SWE-bench_Lite.py "HTTP/1.1 404 Not Found"
+2026-01-09 10:18:25,473 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/datasets/princeton-nlp/SWE-bench_Lite/revision/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2 "HTTP/1.1 200 OK"
+2026-01-09 10:18:25,686 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite/resolve/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/.huggingface.yaml "HTTP/1.1 404 Not Found"
+2026-01-09 10:18:26,068 - httpx - INFO - HTTP Request: GET https://datasets-server.huggingface.co/info?dataset=princeton-nlp/SWE-bench_Lite "HTTP/1.1 200 OK"
+2026-01-09 10:18:26,583 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/datasets/princeton-nlp/SWE-bench_Lite/tree/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/data?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-01-09 10:18:26,887 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/datasets/princeton-nlp/SWE-bench_Lite/tree/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2?recursive=false&expand=false "HTTP/1.1 200 OK"
+2026-01-09 10:18:27,107 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite/resolve/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/dataset_infos.json "HTTP/1.1 404 Not Found"
+2026-01-09 10:18:27,371 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+2026-01-09 10:18:27,382 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/datasets/princeton-nlp/SWE-bench_Lite/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/README.md "HTTP/1.1 200 OK"
+2026-01-09 10:18:27,592 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite/resolve/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/SWE-bench_Lite.py "HTTP/1.1 404 Not Found"
+2026-01-09 10:18:27,912 - httpx - INFO - HTTP Request: HEAD https://s3.amazonaws.com/datasets.huggingface.co/datasets/datasets/princeton-nlp/SWE-bench_Lite/princeton-nlp/SWE-bench_Lite.py "HTTP/1.1 404 Not Found"
+2026-01-09 10:18:28,219 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite/resolve/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/.huggingface.yaml "HTTP/1.1 404 Not Found"
+2026-01-09 10:18:28,446 - httpx - INFO - HTTP Request: GET https://datasets-server.huggingface.co/info?dataset=princeton-nlp/SWE-bench_Lite "HTTP/1.1 200 OK"
+2026-01-09 10:18:28,657 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite/resolve/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/dataset_infos.json "HTTP/1.1 404 Not Found"
+Running 3 instances...
+Evaluation:   0%|          | 0/3 [00:00<?, ?it/s, error=0, ✓=0, ✖=0]Evaluation:   0%|          | 0/3 [03:25<?, ?it/s, ✓=0, ✖=1, error=0]Evaluation:  33%|███▎      | 1/3 [03:25<06:50, 205.07s/it, ✓=0, ✖=1, error=0]Evaluation:  33%|███▎      | 1/3 [03:25<06:50, 205.07s/it, ✓=1, ✖=1, error=0]Evaluation:  67%|██████▋   | 2/3 [03:25<01:24, 84.70s/it, ✓=1, ✖=1, error=0] Evaluation:  67%|██████▋   | 2/3 [03:28<01:24, 84.70s/it, ✓=2, ✖=1, error=0]Evaluation: 100%|██████████| 3/3 [03:28<00:00, 47.22s/it, ✓=2, ✖=1, error=0]Evaluation: 100%|██████████| 3/3 [03:28<00:00, 69.38s/it, ✓=2, ✖=1, error=0]
+All instances run.
+Cleaning cached images...
+Removed 0 images.
+Total instances: 300
+Instances submitted: 10
+Instances completed: 3
+Instances incomplete: 290
+Instances resolved: 2
+Instances unresolved: 1
+Instances with empty patches: 7
+Instances with errors: 0
+Unstopped containers: 0
+Unremoved images: 0
+Report written to claude-haiku-4-5-20251001_baseline.baseline_20260109_101822.json
+
+Evaluating focus agent...
+<frozen runpy>:128: RuntimeWarning: 'swebench.harness.run_evaluation' found in sys.modules after import of package 'swebench.harness', but prior to execution of 'swebench.harness.run_evaluation'; this may result in unpredictable behaviour
+2026-01-09 10:22:09,286 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-01-09 10:22:09,304 - huggingface_hub.utils._http - WARNING - Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-01-09 10:22:09,359 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/datasets/princeton-nlp/SWE-bench_Lite/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/README.md "HTTP/1.1 200 OK"
+2026-01-09 10:22:09,607 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite/resolve/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/SWE-bench_Lite.py "HTTP/1.1 404 Not Found"
+2026-01-09 10:22:10,526 - httpx - INFO - HTTP Request: HEAD https://s3.amazonaws.com/datasets.huggingface.co/datasets/datasets/princeton-nlp/SWE-bench_Lite/princeton-nlp/SWE-bench_Lite.py "HTTP/1.1 404 Not Found"
+2026-01-09 10:22:10,844 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/datasets/princeton-nlp/SWE-bench_Lite/revision/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2 "HTTP/1.1 200 OK"
+2026-01-09 10:22:11,094 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite/resolve/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/.huggingface.yaml "HTTP/1.1 404 Not Found"
+2026-01-09 10:22:11,434 - httpx - INFO - HTTP Request: GET https://datasets-server.huggingface.co/info?dataset=princeton-nlp/SWE-bench_Lite "HTTP/1.1 200 OK"
+2026-01-09 10:22:11,755 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/datasets/princeton-nlp/SWE-bench_Lite/tree/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/data?recursive=true&expand=false "HTTP/1.1 200 OK"
+2026-01-09 10:22:12,166 - httpx - INFO - HTTP Request: GET https://huggingface.co/api/datasets/princeton-nlp/SWE-bench_Lite/tree/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2?recursive=false&expand=false "HTTP/1.1 200 OK"
+2026-01-09 10:22:12,429 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite/resolve/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/dataset_infos.json "HTTP/1.1 404 Not Found"
+2026-01-09 10:22:12,730 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite/resolve/main/README.md "HTTP/1.1 307 Temporary Redirect"
+2026-01-09 10:22:12,761 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/api/resolve-cache/datasets/princeton-nlp/SWE-bench_Lite/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/README.md "HTTP/1.1 200 OK"
+2026-01-09 10:22:13,006 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite/resolve/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/SWE-bench_Lite.py "HTTP/1.1 404 Not Found"
+2026-01-09 10:22:13,278 - httpx - INFO - HTTP Request: HEAD https://s3.amazonaws.com/datasets.huggingface.co/datasets/datasets/princeton-nlp/SWE-bench_Lite/princeton-nlp/SWE-bench_Lite.py "HTTP/1.1 404 Not Found"
+2026-01-09 10:22:13,596 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite/resolve/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/.huggingface.yaml "HTTP/1.1 404 Not Found"
+2026-01-09 10:22:13,848 - httpx - INFO - HTTP Request: GET https://datasets-server.huggingface.co/info?dataset=princeton-nlp/SWE-bench_Lite "HTTP/1.1 200 OK"
+2026-01-09 10:22:14,096 - httpx - INFO - HTTP Request: HEAD https://huggingface.co/datasets/princeton-nlp/SWE-bench_Lite/resolve/6ec7bb89b9342f664a54a6e0a6ea6501d3437cc2/dataset_infos.json "HTTP/1.1 404 Not Found"
+Running 4 instances...
+Evaluation:   0%|          | 0/4 [00:00<?, ?it/s, error=0, ✓=0, ✖=0]Evaluation:   0%|          | 0/4 [01:54<?, ?it/s, ✓=0, ✖=1, error=0]Evaluation:  25%|██▌       | 1/4 [01:54<05:42, 114.12s/it, ✓=0, ✖=1, error=0]Evaluation:  25%|██▌       | 1/4 [02:04<05:42, 114.12s/it, ✓=1, ✖=1, error=0]Evaluation:  50%|█████     | 2/4 [02:04<01:45, 52.87s/it, ✓=1, ✖=1, error=0] Evaluation:  50%|█████     | 2/4 [02:26<01:45, 52.87s/it, ✓=2, ✖=1, error=0]Evaluation:  75%|███████▌  | 3/4 [02:26<00:39, 39.17s/it, ✓=2, ✖=1, error=0]Evaluation:  75%|███████▌  | 3/4 [02:28<00:39, 39.17s/it, ✓=3, ✖=1, error=0]Evaluation: 100%|██████████| 4/4 [02:28<00:00, 24.27s/it, ✓=3, ✖=1, error=0]Evaluation: 100%|██████████| 4/4 [02:28<00:00, 37.10s/it, ✓=3, ✖=1, error=0]
+All instances run.
+Cleaning cached images...
+Removed 0 images.
+Total instances: 300
+Instances submitted: 10
+Instances completed: 4
+Instances incomplete: 290
+Instances resolved: 3
+Instances unresolved: 1
+Instances with empty patches: 6
+Instances with errors: 0
+Unstopped containers: 0
+Unremoved images: 0
+Report written to claude-haiku-4-5-20251001_focus.focus_20260109_101822.json
+
+Evaluation Summary:
+  baseline: ✓
+  focus: ✓
+
+Results saved in: logs/run_evaluation/20260109_101822/
+
+Done!
